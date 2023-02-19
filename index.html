@@ -93,8 +93,6 @@
 
 
     webix.ready(function () {
-
-
       // About Window
       let aboutWindowForm = {
         view: "form", id: "aboutWindowFormId", elements: [
@@ -1157,8 +1155,6 @@
         ]
       }
 
-
-
       // Model Browsing Window to select local model
       webix.ui({
         view: "window",
@@ -1419,13 +1415,9 @@
       }
 
 
-
-
       //--------------------------------------------//
       //---------- Output Rendering ----------------//
       //--------------------------------------------//
-
-
 
       showThreejsWindow = () => {
         var defer = $.Deferred();
@@ -1512,11 +1504,6 @@
           }
         ]
       }
-
-
-
-
-
 
       // Welcome Window
       let welcomeWindowForm = {
@@ -2012,9 +1999,6 @@
           $$("segmentBtn").disable();
         });
 
-
-
-
       //--Activate annotation for papaya container 1- default    
       //-- addMouseMoveHandler(inferenceModelsList[$$("selectModel").getValue() - 1]["labelsPath"], 1);
       addMouseMoveHandler("./models/GT/labels.json", 1);
@@ -2027,13 +2011,7 @@
 
       // Check for possible wrongly report or duplicate models ids
       checkInferenceModelList();
-
-
     })
-
-
-
-
   </script>
 
 

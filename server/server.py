@@ -7,6 +7,7 @@ app = Flask(__name__)
 def server():
     return 'Hello, World!'
 
+
 @app.route('/brainchop')
 def index():
     return render_template('./index.html')

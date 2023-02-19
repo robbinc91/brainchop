@@ -14,139 +14,139 @@
 
 =========================================================
                 3D/2D Connected Components
-=========================================================*/  
+=========================================================*/
 
-    /**
-    * Get binary mask of slice data
-    *
-    * @since 1.0.0
-    * @param {Array} sliceData- The array represents slice pixel values in 1D
-    * @returns {Array} Returns binary mask in 1D
-    * @example
-    *
-    * getBinaryMaskData1D([0,100,100, 0,255,255, .. ])
-    * // => [0,1,1, 0,1,1, .. ]
-    *
-    */ 
+/**
+* Get binary mask of slice data
+*
+* @since 1.0.0
+* @param {Array} sliceData- The array represents slice pixel values in 1D
+* @returns {Array} Returns binary mask in 1D
+* @example
+*
+* getBinaryMaskData1D([0,100,100, 0,255,255, .. ])
+* // => [0,1,1, 0,1,1, .. ]
+*
+*/
 
-    getBinaryMaskData1D = (sliceData) => { // greyImage is one channel 2D image with values 0-255
-          
-          let maskBinaryData1D = [];
-          for (let idx = 0; idx < sliceData.length; idx++) {
+getBinaryMaskData1D = (sliceData) => { // greyImage is one channel 2D image with values 0-255
 
-               if(sliceData[idx] > 0) {
-                  maskBinaryData1D[idx] = 1;                   
-               } else {
-                  maskBinaryData1D[idx] = 0;                   
-               }
-          }
-      
-          return maskBinaryData1D;
+    let maskBinaryData1D = [];
+    for (let idx = 0; idx < sliceData.length; idx++) {
+
+        if (sliceData[idx] > 0) {
+            maskBinaryData1D[idx] = 1;
+        } else {
+            maskBinaryData1D[idx] = 0;
+        }
     }
 
-
-
-    /**
-    * Convert 1D binary data to 2D
-    *
-    * @since 1.0.0
-    * @param {Array} binaryData1D- The array represents slice binary mask values in 1D
-    * @param {number} imgHeight- Slice Height
-    * @param {number} imgWidth - Slice Width
-    * @returns {Array} Returns binary mask in 2D
-    * @example
-    *
-    * convertBinaryDataTo2D([0,1,1, 0,0,1 ], 2, 3)
-    *
-    * // => [ [0,1,1],
-    *         [0,0,1],
-    *       ]
-    *
-    */ 
-
-    convertBinaryDataTo2D = (binaryData1D, imgHeight, imgWidth) => {
-        return tf.tensor(binaryData1D, [imgHeight, imgWidth]).arraySync();
-    }
+    return maskBinaryData1D;
+}
 
 
 
+/**
+* Convert 1D binary data to 2D
+*
+* @since 1.0.0
+* @param {Array} binaryData1D- The array represents slice binary mask values in 1D
+* @param {number} imgHeight- Slice Height
+* @param {number} imgWidth - Slice Width
+* @returns {Array} Returns binary mask in 2D
+* @example
+*
+* convertBinaryDataTo2D([0,1,1, 0,0,1 ], 2, 3)
+*
+* // => [ [0,1,1],
+*         [0,0,1],
+*       ]
+*
+*/
 
-    /**
-    * Add zero padding to 2D array e.g label2D
-    * pad([[1,1],[1,1]]) means: 1 row of zeros befor, 1 row of zeros after,
-    *                           1 col of zeros befor, 1 col of zeros after,
-    * Ref: https://js.tensorflow.org/api/3.6.0/#pad
-    *
-    * @since 1.0.0
-    * @param {Array} arr2d- The array can represents slice binary mask values in 2D
-    * @returns {Array} Returns same input array with zero padding edges
-    * @example
-    *
-    * addZeroPaddingTo2dArray( [ [1,0,1],
-    *                            [0,0,1] ])
-    *
-    * // => [ [0,0,0,0,0],
-    *         [0,1,0,1,0],
-    *         [0,0,0,1,0],
-    *         [0,0,0,0,0],
-    *       ]
-    *
-    */ 
-
-    addZeroPaddingTo2dArray = (arr2d) => {
-        const tensor2d = tf.tensor2d(arr2d);
-        return tensor2d.pad([[1,1],[1,1]]).arraySync();
-    }
+convertBinaryDataTo2D = (binaryData1D, imgHeight, imgWidth) => {
+    return tf.tensor(binaryData1D, [imgHeight, imgWidth]).arraySync();
+}
 
 
-    /**
-    * remove zero padding from 2D array e.g label2D
-    * pad([[1,1],[1,1]]) means: 1 row of zeros befor, 1 row of zeros after,
-    *                           1 col of zeros befor, 1 col of zeros after,
-    *
-    * @since 1.0.0
-    * @param {Array} arr2d- The array can represents slice binary mask values in 2D
-    * @returns {Array} Returns same input array without zero padding edges
-    * @example
-    *
-    * removeZeroPaddingFrom2dArray( [ [0,0,0,0,0],
-    *                                 [0,1,0,1,0],
-    *                                 [0,0,0,1,0],
-    *                                 [0,0,0,0,0],
-    *                                             ])
-    *
-    * // => [ [1,0,1],
-    *         [0,0,1],
-    *       ]
-    *
-    */ 
-
-    removeZeroPaddingFrom2dArray = (arr2d) => {
-        const tensor2d = tf.tensor2d(arr2d);
-        [h, w] = tensor2d.shape;
-        return tensor2d.slice([1,1],[h-2,w-2]).arraySync();
-    }
 
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////
- /////////////                   2D Connected Components                          /////////////////
+/**
+* Add zero padding to 2D array e.g label2D
+* pad([[1,1],[1,1]]) means: 1 row of zeros befor, 1 row of zeros after,
+*                           1 col of zeros befor, 1 col of zeros after,
+* Ref: https://js.tensorflow.org/api/3.6.0/#pad
+*
+* @since 1.0.0
+* @param {Array} arr2d- The array can represents slice binary mask values in 2D
+* @returns {Array} Returns same input array with zero padding edges
+* @example
+*
+* addZeroPaddingTo2dArray( [ [1,0,1],
+*                            [0,0,1] ])
+*
+* // => [ [0,0,0,0,0],
+*         [0,1,0,1,0],
+*         [0,0,0,1,0],
+*         [0,0,0,0,0],
+*       ]
+*
+*/
+
+addZeroPaddingTo2dArray = (arr2d) => {
+    const tensor2d = tf.tensor2d(arr2d);
+    return tensor2d.pad([[1, 1], [1, 1]]).arraySync();
+}
+
+
+/**
+* remove zero padding from 2D array e.g label2D
+* pad([[1,1],[1,1]]) means: 1 row of zeros befor, 1 row of zeros after,
+*                           1 col of zeros befor, 1 col of zeros after,
+*
+* @since 1.0.0
+* @param {Array} arr2d- The array can represents slice binary mask values in 2D
+* @returns {Array} Returns same input array without zero padding edges
+* @example
+*
+* removeZeroPaddingFrom2dArray( [ [0,0,0,0,0],
+*                                 [0,1,0,1,0],
+*                                 [0,0,0,1,0],
+*                                 [0,0,0,0,0],
+*                                             ])
+*
+* // => [ [1,0,1],
+*         [0,0,1],
+*       ]
+*
+*/
+
+removeZeroPaddingFrom2dArray = (arr2d) => {
+    const tensor2d = tf.tensor2d(arr2d);
+    [h, w] = tensor2d.shape;
+    return tensor2d.slice([1, 1], [h - 2, w - 2]).arraySync();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////                   2D Connected Components                          /////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
- // class ConnectCompFor2D extends basicImageProcessing {
- class ConnectCompFor2D {    
-     constructor () {
-      this._equivalenceTabel = [];
-      this._equivalenceTabel[0] = 0;
-      this._maxLabel = 0;
-     }
+// class ConnectCompFor2D extends basicImageProcessing {
+class ConnectCompFor2D {
+    constructor() {
+        this._equivalenceTabel = [];
+        this._equivalenceTabel[0] = 0;
+        this._maxLabel = 0;
+    }
 
     _updateEquivalenceTable = (label, newLabel) => {
         this._equivalenceTabel[label] = newLabel;
     }
 
     _resetEquivalenceTable = () => {
-       this._equivalenceTabel = [];
-       this._equivalenceTabel[0] = 0;
+        this._equivalenceTabel = [];
+        this._equivalenceTabel[0] = 0;
     }
 
 
@@ -157,14 +157,14 @@
     * @since 1.0.0
     * @param {number} labelIdx 
     *
-    */ 
+    */
 
     _adjustEquivalenceTable = (labelIdx) => {
 
-        if(this._equivalenceTabel[labelIdx] != labelIdx) {
+        if (this._equivalenceTabel[labelIdx] != labelIdx) {
             this._equivalenceTabel[labelIdx] = this._adjustEquivalenceTable(this._equivalenceTabel[labelIdx]);
-        } 
-       
+        }
+
         return this._equivalenceTabel[labelIdx];
     }
 
@@ -186,31 +186,31 @@
     *                      [0,0,0,0] ], 2, 2, 5)
     * // => 4
     *
-    */ 
+    */
 
     _checkNeighbors2D = (label, row, col, maxLabel) => {
 
-        if ( label[row][col - 1] && label[row - 1][col]) {
+        if (label[row][col - 1] && label[row - 1][col]) {
 
-              if(label[row][col - 1] == label[row - 1][col]) {
-                 return label[row ][col - 1];
+            if (label[row][col - 1] == label[row - 1][col]) {
+                return label[row][col - 1];
 
-              } else {
+            } else {
 
-                 let smallerLabel = ( label[row][col - 1] < label[row - 1][col] ) ? label[row][col - 1] : label[row - 1][col];
-                 let largerLabel = ( label[row][col - 1] > label[row - 1][col] ) ? label[row][col - 1] : label[row - 1][col];
-                 this._updateEquivalenceTable(largerLabel, smallerLabel);                
-                 return smallerLabel;
-              }
+                let smallerLabel = (label[row][col - 1] < label[row - 1][col]) ? label[row][col - 1] : label[row - 1][col];
+                let largerLabel = (label[row][col - 1] > label[row - 1][col]) ? label[row][col - 1] : label[row - 1][col];
+                this._updateEquivalenceTable(largerLabel, smallerLabel);
+                return smallerLabel;
+            }
 
-        } else if ( label[row ][col - 1] ) {
-            return label[row ][col - 1] ;
-        } else if ( label[row - 1][col] ) {
-            return label[row - 1][col];            
+        } else if (label[row][col - 1]) {
+            return label[row][col - 1];
+        } else if (label[row - 1][col]) {
+            return label[row - 1][col];
         } else {
-            this._updateEquivalenceTable(maxLabel+1, maxLabel+1); 
-            return maxLabel+1 ;
-        }  
+            this._updateEquivalenceTable(maxLabel + 1, maxLabel + 1);
+            return maxLabel + 1;
+        }
 
     }
 
@@ -233,58 +233,58 @@
     *         [0,0,0,0,0]
     *       ]
     *
-    */ 
+    */
 
-    getConComponentsFor2D = (binaryMaskData2D, imgHeight, imgWidth) => {  
+    getConComponentsFor2D = (binaryMaskData2D, imgHeight, imgWidth) => {
         // initiat label
         let label1D = [];
-        this._resetEquivalenceTable();           
-        for(let idx = 0; idx < imgHeight * imgWidth; idx++) {
-                 label1D[idx] = 0;
-        }     
-        
-        let label2D = convertBinaryDataTo2D(label1D, imgHeight, imgWidth);         
+        this._resetEquivalenceTable();
+        for (let idx = 0; idx < imgHeight * imgWidth; idx++) {
+            label1D[idx] = 0;
+        }
 
-        let label2DwithPad = addZeroPaddingTo2dArray(label2D);  
-        let binaryMaskData2DwithPad = addZeroPaddingTo2dArray(binaryMaskData2D); 
+        let label2D = convertBinaryDataTo2D(label1D, imgHeight, imgWidth);
+
+        let label2DwithPad = addZeroPaddingTo2dArray(label2D);
+        let binaryMaskData2DwithPad = addZeroPaddingTo2dArray(binaryMaskData2D);
 
 
         // maxLabel initiation to zero, starting label for 2d and 3d labeling
-        this._maxLabel = 0; 
+        this._maxLabel = 0;
 
         // 1st pass
-        for(let row = 1; row <= imgHeight; row++) {
-            for(let col = 1; col <= imgWidth; col++) { 
-               
-               if( binaryMaskData2DwithPad[row][col] != 0) {
-                  label2DwithPad[row][col] = this._checkNeighbors2D(label2DwithPad, row, col, this._maxLabel)
-                  if(this._maxLabel < label2DwithPad[row][col]) {
-                     this._maxLabel = label2DwithPad[row][col];
-                  }
+        for (let row = 1; row <= imgHeight; row++) {
+            for (let col = 1; col <= imgWidth; col++) {
 
-               }
+                if (binaryMaskData2DwithPad[row][col] != 0) {
+                    label2DwithPad[row][col] = this._checkNeighbors2D(label2DwithPad, row, col, this._maxLabel)
+                    if (this._maxLabel < label2DwithPad[row][col]) {
+                        this._maxLabel = label2DwithPad[row][col];
+                    }
+
+                }
             }
         }
- 
+
 
         label2D = removeZeroPaddingFrom2dArray(label2DwithPad);
 
         // adjust Equivalence table labels such that  eqvTabel[3] = 2 && eqvTabel[2] = 1 => eqvTabel[3] = 1      
-        for(let labelIdx = this._equivalenceTabel.length - 1; labelIdx > 0; labelIdx = labelIdx-1 ) {          
-            this._adjustEquivalenceTable (labelIdx);
-        }  
+        for (let labelIdx = this._equivalenceTabel.length - 1; labelIdx > 0; labelIdx = labelIdx - 1) {
+            this._adjustEquivalenceTable(labelIdx);
+        }
 
         // 2nd pass : relabeling the slice after eqvTable adjustment 
-        for(let row = 0; row < imgHeight; row++) {
-            for(let col = 0; col < imgWidth; col++) { 
-               
-               if( label2D[row][col] != 0) {
-                    label2D[row][col] = this._equivalenceTabel[label2D[row][col]];
-               }
-            }
-        }          
+        for (let row = 0; row < imgHeight; row++) {
+            for (let col = 0; col < imgWidth; col++) {
 
-        return   label2D;
+                if (label2D[row][col] != 0) {
+                    label2D[row][col] = this._equivalenceTabel[label2D[row][col]];
+                }
+            }
+        }
+
+        return label2D;
     }
 
 
@@ -294,8 +294,8 @@
 
 
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////
- /////////////                   3D Connected Components                          /////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////                   3D Connected Components                          /////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ConnectCompFor3D extends ConnectCompFor2D {
@@ -314,24 +314,24 @@ class ConnectCompFor3D extends ConnectCompFor2D {
     * getMaxLabelFor3D( [ [[0,0,0],[0,1,0]],[[0,2,0],[0,0,3]] ], 2, 3, 2)
     * // => 3
     *
-    */ 
+    */
 
-    getMaxLabelFor3D = (label3D, sliceHeight, sliceWidth, numSlices) => {  
+    getMaxLabelFor3D = (label3D, sliceHeight, sliceWidth, numSlices) => {
 
-        let maxLabelFor3D = 0; 
+        let maxLabelFor3D = 0;
 
-        for(let sliceIdx = 0; sliceIdx < numSlices; sliceIdx++ ) {
-              for(let row = 0; row < sliceHeight; row++) {
-                  for(let col = 0; col < sliceWidth; col++) { 
-                     
-                     if( label3D[sliceIdx][row][col] > maxLabelFor3D) {
-                         maxLabelFor3D = label3D[sliceIdx][row][col];
-                     }
-                  }
-              }
-        } 
+        for (let sliceIdx = 0; sliceIdx < numSlices; sliceIdx++) {
+            for (let row = 0; row < sliceHeight; row++) {
+                for (let col = 0; col < sliceWidth; col++) {
 
-        return   maxLabelFor3D;
+                    if (label3D[sliceIdx][row][col] > maxLabelFor3D) {
+                        maxLabelFor3D = label3D[sliceIdx][row][col];
+                    }
+                }
+            }
+        }
+
+        return maxLabelFor3D;
     }
 
 
@@ -349,38 +349,38 @@ class ConnectCompFor3D extends ConnectCompFor2D {
     * getMostFreqVolumeLabel3D( [ [[0,1,0],[0,1,0]],[[0,2,0],[0,0,3]] ], 2, 3, 2)
     * // => 1
     *
-    */ 
-    
+    */
+
     getMostFreqVolumeLabel3D = (label3D, sliceHeight, sliceWidth, numSlices) => {
 
         // Initiat connected component volumes to zeros   
         let ccVolume = [];
         let maxCCLabel3D = this.getMaxLabelFor3D(label3D, sliceHeight, sliceWidth, numSlices)
 
-        for( let idx = 0; idx < maxCCLabel3D; idx ++) {         
-              ccVolume[idx] = 0;
-        }  
-        
-        for(let sliceIdx = 0; sliceIdx < numSlices; sliceIdx++ ) {         
-                for(let row = 0; row < sliceHeight; row++) {
-                    for(let col = 0; col < sliceWidth; col++) { 
-                       ccVolume[label3D[sliceIdx][row][col]] = ccVolume[label3D[sliceIdx][row][col]] +1;
-                    }  
-                }
+        for (let idx = 0; idx < maxCCLabel3D; idx++) {
+            ccVolume[idx] = 0;
         }
-     
+
+        for (let sliceIdx = 0; sliceIdx < numSlices; sliceIdx++) {
+            for (let row = 0; row < sliceHeight; row++) {
+                for (let col = 0; col < sliceWidth; col++) {
+                    ccVolume[label3D[sliceIdx][row][col]] = ccVolume[label3D[sliceIdx][row][col]] + 1;
+                }
+            }
+        }
+
         let maxCcVolume = 0;
         let maxCcVolumeLabel = -1;
 
-        for( let idx = 1; idx < maxCCLabel3D; idx ++) {  
+        for (let idx = 1; idx < maxCCLabel3D; idx++) {
 
-            if( maxCcVolume < ccVolume[idx] ) {
-                 maxCcVolume = ccVolume[idx];
-                 maxCcVolumeLabel = idx;
-            }      
-        } 
+            if (maxCcVolume < ccVolume[idx]) {
+                maxCcVolume = ccVolume[idx];
+                maxCcVolumeLabel = idx;
+            }
+        }
 
-        return   maxCcVolumeLabel;
+        return maxCcVolumeLabel;
     }
 
 
@@ -403,77 +403,77 @@ class ConnectCompFor3D extends ConnectCompFor2D {
     *                      [0,0 ,0,0] ], 16 , 2, 2, 18)
     * // => 16
     *
-    */  
+    */
 
 
     _checkNeighbors3D = (label, z_1PixelLabel, row, col, maxLabel) => { //z_1PixelLabel same x,y pixel label of z-1 prev slice
-          if ( label[row][col - 1] && label[row - 1][col] && z_1PixelLabel) {
+        if (label[row][col - 1] && label[row - 1][col] && z_1PixelLabel) {
 
-                if( (label[row][col - 1] == label[row - 1][col]) && (label[row][col - 1] == z_1PixelLabel) ) {
-                   return z_1PixelLabel;
+            if ((label[row][col - 1] == label[row - 1][col]) && (label[row][col - 1] == z_1PixelLabel)) {
+                return z_1PixelLabel;
 
-                } else {
+            } else {
 
-                   let smallLabel = ( label[row][col - 1] < label[row - 1][col] ) ? label[row][col - 1] : label[row - 1][col];
-                   let smallestLabel = ( z_1PixelLabel < smallLabel ) ? z_1PixelLabel : smallLabel;                
-                   let largerLabel = ( label[row][col - 1] > label[row - 1][col] ) ? label[row][col - 1] : label[row - 1][col];
-                   this._updateEquivalenceTable(largerLabel, smallestLabel);                   
-                   this._updateEquivalenceTable(smallLabel, smallestLabel);                
-                   return smallestLabel;
-                }
+                let smallLabel = (label[row][col - 1] < label[row - 1][col]) ? label[row][col - 1] : label[row - 1][col];
+                let smallestLabel = (z_1PixelLabel < smallLabel) ? z_1PixelLabel : smallLabel;
+                let largerLabel = (label[row][col - 1] > label[row - 1][col]) ? label[row][col - 1] : label[row - 1][col];
+                this._updateEquivalenceTable(largerLabel, smallestLabel);
+                this._updateEquivalenceTable(smallLabel, smallestLabel);
+                return smallestLabel;
+            }
 
-          } else if ( label[row][col - 1] && label[row - 1][col] ) {
+        } else if (label[row][col - 1] && label[row - 1][col]) {
 
-              if(label[row][col - 1] == label[row - 1][col]) {
-                 return label[row ][col - 1];
+            if (label[row][col - 1] == label[row - 1][col]) {
+                return label[row][col - 1];
 
-              } else {
+            } else {
 
-                 let smallerLabel = ( label[row][col - 1] < label[row - 1][col] ) ? label[row][col - 1] : label[row - 1][col];
-                 let largerLabel = ( label[row][col - 1] > label[row - 1][col] ) ? label[row][col - 1] : label[row - 1][col];
-                 this._updateEquivalenceTable(largerLabel, smallerLabel);                
-                 return smallerLabel;
-              }
-              
+                let smallerLabel = (label[row][col - 1] < label[row - 1][col]) ? label[row][col - 1] : label[row - 1][col];
+                let largerLabel = (label[row][col - 1] > label[row - 1][col]) ? label[row][col - 1] : label[row - 1][col];
+                this._updateEquivalenceTable(largerLabel, smallerLabel);
+                return smallerLabel;
+            }
 
-          } else if ( label[row - 1][col] && z_1PixelLabel ) {
 
-              if(label[row - 1][col] == z_1PixelLabel) {
-                 return z_1PixelLabel;
+        } else if (label[row - 1][col] && z_1PixelLabel) {
 
-              } else {
+            if (label[row - 1][col] == z_1PixelLabel) {
+                return z_1PixelLabel;
 
-                 let smallerLabel = ( z_1PixelLabel < label[row - 1][col] ) ? z_1PixelLabel : label[row - 1][col];
-                 let largerLabel = ( z_1PixelLabel > label[row - 1][col] ) ? z_1PixelLabel : label[row - 1][col];
-                 this._updateEquivalenceTable(largerLabel, smallerLabel);                
-                 return smallerLabel;
-              }                
+            } else {
 
-          } else if ( label[row][col - 1] && z_1PixelLabel ) {
-              
-              if( label[row][col - 1] == z_1PixelLabel ) {
-                 return z_1PixelLabel;
+                let smallerLabel = (z_1PixelLabel < label[row - 1][col]) ? z_1PixelLabel : label[row - 1][col];
+                let largerLabel = (z_1PixelLabel > label[row - 1][col]) ? z_1PixelLabel : label[row - 1][col];
+                this._updateEquivalenceTable(largerLabel, smallerLabel);
+                return smallerLabel;
+            }
 
-              } else {
+        } else if (label[row][col - 1] && z_1PixelLabel) {
 
-                 let smallerLabel = ( label[row][col - 1] < z_1PixelLabel ) ? label[row][col - 1] : z_1PixelLabel;
-                 let largerLabel = ( label[row][col - 1] > z_1PixelLabel ) ? label[row][col - 1] : z_1PixelLabel;
-                 this._updateEquivalenceTable(largerLabel, smallerLabel);                
-                 return smallerLabel;
-              }
-                                              
-          } else if ( label[row ][col - 1] ) {
-              return label[row ][col - 1] ;
-          } else if ( label[row - 1][col] ) {
-              return label[row - 1][col]; 
-          } else if ( z_1PixelLabel) {
-              return z_1PixelLabel;  
-          } else {
-              this._updateEquivalenceTable(maxLabel+1, maxLabel+1); 
-              return maxLabel+1 ;
-          } 
+            if (label[row][col - 1] == z_1PixelLabel) {
+                return z_1PixelLabel;
+
+            } else {
+
+                let smallerLabel = (label[row][col - 1] < z_1PixelLabel) ? label[row][col - 1] : z_1PixelLabel;
+                let largerLabel = (label[row][col - 1] > z_1PixelLabel) ? label[row][col - 1] : z_1PixelLabel;
+                this._updateEquivalenceTable(largerLabel, smallerLabel);
+                return smallerLabel;
+            }
+
+        } else if (label[row][col - 1]) {
+            return label[row][col - 1];
+        } else if (label[row - 1][col]) {
+            return label[row - 1][col];
+        } else if (z_1PixelLabel) {
+            return z_1PixelLabel;
+        } else {
+            this._updateEquivalenceTable(maxLabel + 1, maxLabel + 1);
+            return maxLabel + 1;
+        }
     }
-   
+
 
     /**
     * Get connected components For 3D Volume  --(refine)
@@ -502,43 +502,43 @@ class ConnectCompFor3D extends ConnectCompFor2D {
     *           [0,2,0,0]], 
     *       ]
     *
-    */    
+    */
     getConComponentsFor3DVolume = (volumeSlices, sliceHeight, sliceWidth) => {
 
-          let binaryMaskData1D = [];
-          let binaryMaskData2D = [];     
-          let label3D = [];  
+        let binaryMaskData1D = [];
+        let binaryMaskData2D = [];
+        let label3D = [];
 
-          for(let sliceIdx = 0; sliceIdx < volumeSlices.length; sliceIdx++) {
-               
-                binaryMaskData1D[sliceIdx] = getBinaryMaskData1D(volumeSlices[sliceIdx]); // binaryMaskData1D has values 0 or 1 
+        for (let sliceIdx = 0; sliceIdx < volumeSlices.length; sliceIdx++) {
 
-                binaryMaskData2D[sliceIdx] = convertBinaryDataTo2D(binaryMaskData1D[sliceIdx], sliceHeight, sliceWidth);
+            binaryMaskData1D[sliceIdx] = getBinaryMaskData1D(volumeSlices[sliceIdx]); // binaryMaskData1D has values 0 or 1 
 
-                if(sliceIdx == 0) {
-                    //Only called for once at begining with first slice
-                    label3D[sliceIdx] = this.getConComponentsFor2D(binaryMaskData2D[sliceIdx], sliceHeight, sliceWidth);
+            binaryMaskData2D[sliceIdx] = convertBinaryDataTo2D(binaryMaskData1D[sliceIdx], sliceHeight, sliceWidth);
 
-                } else {
-                    label3D[sliceIdx] = this._getConComponentsFor2Slices(binaryMaskData2D[sliceIdx], label3D[sliceIdx - 1], sliceHeight, sliceWidth);
+            if (sliceIdx == 0) {
+                //Only called for once at begining with first slice
+                label3D[sliceIdx] = this.getConComponentsFor2D(binaryMaskData2D[sliceIdx], sliceHeight, sliceWidth);
+
+            } else {
+                label3D[sliceIdx] = this._getConComponentsFor2Slices(binaryMaskData2D[sliceIdx], label3D[sliceIdx - 1], sliceHeight, sliceWidth);
+            }
+
+        }
+
+        // 3d connected components third pass
+        for (let sliceIdx = 0; sliceIdx < volumeSlices.length; sliceIdx++) {
+            let row, col;
+            for (row = 0; row < sliceHeight; row++) {
+                for (col = 0; col < sliceWidth; col++) {
+
+                    if (label3D[sliceIdx][row][col] != 0) {
+                        label3D[sliceIdx][row][col] = this._equivalenceTabel[label3D[sliceIdx][row][col]];
+                    }
                 }
+            }
+        }
 
-          }
-
-          // 3d connected components third pass
-          for(let sliceIdx = 0; sliceIdx < volumeSlices.length; sliceIdx++) {
-              let row, col;
-              for(row = 0; row < sliceHeight; row++) {
-                  for(col = 0; col < sliceWidth; col++) {
-                     
-                     if( label3D[sliceIdx][row][col] != 0) {
-                          label3D[sliceIdx][row][col] = this._equivalenceTabel[label3D[sliceIdx][row][col]];
-                     }
-                  }
-              }  
-          }    
-
-          return  label3D;              
+        return label3D;
     }
 
 
@@ -566,55 +566,55 @@ class ConnectCompFor3D extends ConnectCompFor2D {
     *         [0,0,0,0,0]
     *       ]
     *
-    */ 
+    */
 
-  
-    _getConComponentsFor2Slices = (binaryMaskData2D, preSliceLabels, imgHeight, imgWidth) => {  
+
+    _getConComponentsFor2Slices = (binaryMaskData2D, preSliceLabels, imgHeight, imgWidth) => {
         let label1D = [];
         // resetEquivalenceTable();           
-        for(let idx = 0; idx < imgHeight * imgWidth; idx++) {
-             label1D[idx] = 0;
-        }     
-        
-        let label2D =   convertBinaryDataTo2D(label1D, imgHeight, imgWidth);
+        for (let idx = 0; idx < imgHeight * imgWidth; idx++) {
+            label1D[idx] = 0;
+        }
+
+        let label2D = convertBinaryDataTo2D(label1D, imgHeight, imgWidth);
 
         // Add zero padding for cases where image has pixel value > 0  on borders 
         // e.g. MRI is touching borders or there is noisy pixel with value > 0 at row 0 or column 0
 
-        let label2DwithPad = addZeroPaddingTo2dArray(label2D);  
-        let binaryMaskData2DwithPad = addZeroPaddingTo2dArray(binaryMaskData2D); 
-        let preSliceLabelsWithPad = addZeroPaddingTo2dArray(preSliceLabels);                       
+        let label2DwithPad = addZeroPaddingTo2dArray(label2D);
+        let binaryMaskData2DwithPad = addZeroPaddingTo2dArray(binaryMaskData2D);
+        let preSliceLabelsWithPad = addZeroPaddingTo2dArray(preSliceLabels);
 
-        for(let row = 1; row <= imgHeight; row++) {
-            for(let col = 1; col <= imgWidth; col++) { 
-               
-               if( binaryMaskData2DwithPad[row][col] != 0) {
-                  label2DwithPad[row][col] = this._checkNeighbors3D(label2DwithPad, preSliceLabelsWithPad[row][col], row, col, this._maxLabel)
-                  if(this._maxLabel < label2DwithPad[row][col]) {
-                     this._maxLabel = label2DwithPad[row][col];
-                  }
+        for (let row = 1; row <= imgHeight; row++) {
+            for (let col = 1; col <= imgWidth; col++) {
 
-               }
+                if (binaryMaskData2DwithPad[row][col] != 0) {
+                    label2DwithPad[row][col] = this._checkNeighbors3D(label2DwithPad, preSliceLabelsWithPad[row][col], row, col, this._maxLabel)
+                    if (this._maxLabel < label2DwithPad[row][col]) {
+                        this._maxLabel = label2DwithPad[row][col];
+                    }
+
+                }
             }
         }
-        
+
         label2D = removeZeroPaddingFrom2dArray(label2DwithPad);
 
         // console.log("First pass label2D :", label2D);
-        for(let labelIdx = this._equivalenceTabel.length - 1; labelIdx > 0; labelIdx = labelIdx-1 ) {          
-            this._adjustEquivalenceTable (labelIdx);
-        }  
+        for (let labelIdx = this._equivalenceTabel.length - 1; labelIdx > 0; labelIdx = labelIdx - 1) {
+            this._adjustEquivalenceTable(labelIdx);
+        }
 
-        for(let row = 0; row < imgHeight; row++) {
-            for(let col = 0; col < imgWidth; col++) { 
-               
-               if( label2D[row][col] != 0) {
+        for (let row = 0; row < imgHeight; row++) {
+            for (let col = 0; col < imgWidth; col++) {
+
+                if (label2D[row][col] != 0) {
                     label2D[row][col] = this._equivalenceTabel[label2D[row][col]];
-               }
+                }
             }
-        }          
+        }
 
-        return   label2D;
+        return label2D;
     }
 
 
@@ -638,48 +638,48 @@ class ConnectCompFor3D extends ConnectCompFor2D {
     *          [0,0,0,0,  0,0,0,1,  0,0,0,0] 
     *        ]
     *
-    */  
+    */
 
-     findLargest3dRegion = (volumeSlices, sliceHeight, sliceWidth) => {
+    findLargest3dRegion = (volumeSlices, sliceHeight, sliceWidth) => {
 
-          let label3D = [];  
+        let label3D = [];
 
-          label3D = this.getConComponentsFor3DVolume(volumeSlices, sliceHeight, sliceWidth);
+        label3D = this.getConComponentsFor3DVolume(volumeSlices, sliceHeight, sliceWidth);
 
-          // Filter only largest volumetric 3d region with the most voxels of same label and remove noisy smaller 3d regions 
-          let maxVolumeLabel =  this.getMostFreqVolumeLabel3D(label3D, sliceHeight, sliceWidth, volumeSlices.length);   
+        // Filter only largest volumetric 3d region with the most voxels of same label and remove noisy smaller 3d regions 
+        let maxVolumeLabel = this.getMostFreqVolumeLabel3D(label3D, sliceHeight, sliceWidth, volumeSlices.length);
 
-          for(let sliceIdx = 0; sliceIdx < volumeSlices.length; sliceIdx++) {
-                  //Get max volume mask 
-                  let row, col;
-                  for(row = 0; row < sliceHeight; row++) {
-                      for(col = 0; col < sliceWidth; col++) { 
-                         // remove nosiy smaller regions
-                         if(label3D[sliceIdx][row][col] != maxVolumeLabel) {
-                             label3D[sliceIdx][row][col] = 0;
-                         } else {
-                             //mask largest 3d volumatic region 
-                             label3D[sliceIdx][row][col] = 255;
-                         }
-                      }  
-                  }                   
+        for (let sliceIdx = 0; sliceIdx < volumeSlices.length; sliceIdx++) {
+            //Get max volume mask 
+            let row, col;
+            for (row = 0; row < sliceHeight; row++) {
+                for (col = 0; col < sliceWidth; col++) {
+                    // remove nosiy smaller regions
+                    if (label3D[sliceIdx][row][col] != maxVolumeLabel) {
+                        label3D[sliceIdx][row][col] = 0;
+                    } else {
+                        //mask largest 3d volumatic region 
+                        label3D[sliceIdx][row][col] = 255;
+                    }
+                }
+            }
 
-                  let pixelIdx;
+            let pixelIdx;
 
-                  for(row = 0, pixelIdx = 0; row < sliceHeight; row++) {
-                      for(col = 0; col < sliceWidth; col++, pixelIdx++) { 
-                         //Filter smaller regions original MRI data 
-                         if(label3D[sliceIdx][row][col] == 0) {
-                            volumeSlices[sliceIdx][pixelIdx] = 0;
-                         }
+            for (row = 0, pixelIdx = 0; row < sliceHeight; row++) {
+                for (col = 0; col < sliceWidth; col++, pixelIdx++) {
+                    //Filter smaller regions original MRI data 
+                    if (label3D[sliceIdx][row][col] == 0) {
+                        volumeSlices[sliceIdx][pixelIdx] = 0;
+                    }
 
-                      }  
-                  } 
-         }
+                }
+            }
+        }
 
-         //-- Postprocess volumeSlices after remove noisy regions or smaller regions 
-         return volumeSlices;
-     }  
+        //-- Postprocess volumeSlices after remove noisy regions or smaller regions 
+        return volumeSlices;
+    }
 
 }
 

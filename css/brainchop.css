@@ -19,32 +19,32 @@
   background-color: white !important;
   font-weight: bold;
   box-shadow: 5px 5px;
-} 
+}
 
 .titleclass {
   font-style: italic;
   font-weight: bold;
   color: black !important;
-}  
+}
 
 .headerclass {
-      border-left: 10px solid black!important;
-      background: #f3f3f6a3!important;
-      margin-left: 0!important;
-      width: 100%!important;
-      color: black!important;
-      font-weight: bold;
-      border-left-color: black!important;
+  border-left: 10px solid black !important;
+  background: #f3f3f6a3 !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+  color: black !important;
+  font-weight: bold;
+  border-left-color: black !important;
 }
 
 .windowtitleclass {
   background-color: #ccc !important;
   box-shadow: none,
-}      
+}
 
 .webixbg .webix_view {
-  background-color:black !important;
-  box-shadow:none;
+  background-color: black !important;
+  box-shadow: none;
 }
 
 #feedbackId {
@@ -56,43 +56,44 @@
   cursor: pointer;
   margin-right: 20px;
 }
+
 .customTheme {
-    font-weight: bold;
-    background-color: black;
-    color:  white;
+  font-weight: bold;
+  background-color: black;
+  color: white;
 }
 
 #annotOfContainer_0 {
-    /*font-weight: bold;*/
-    background-color: black;
-    color:  white;
-    text-align: center;
-    height: 3vh;
+  /*font-weight: bold;*/
+  background-color: black;
+  color: white;
+  text-align: center;
+  height: 3vh;
 }
 
 #annotOfContainer_1 {
-    /*font-weight: bold;*/
-    background-color: black;
-    color:  white;
-    text-align: center;
-    height: 3vh;
+  /*font-weight: bold;*/
+  background-color: black;
+  color: white;
+  text-align: center;
+  height: 3vh;
 }
 
 .bt_1 button.webix_button {
   background: #396D9E;
-  background: -moz-linear-gradient(top, #5D91C3 0% , #396D9E 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0,#5D91C3), color-stop(1, black));
-  border:1px solid #396D9E;
+  background: -moz-linear-gradient(top, #5D91C3 0%, #396D9E 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #5D91C3), color-stop(1, black));
+  border: 1px solid #396D9E;
   text-shadow: 0 -1px #134471;
   box-shadow: inset 0px 1px 10px #8eb3d5;
   -webkit-box-shadow: inset 0px 1px 1px #8eb3d5;
-  color:#FFFFFF;
+  color: #FFFFFF;
   font-size: 13px;
 }
 
 .bt_1 button:active {
   background: #396D9E !important;
-}    
+}
 
 #output_gui_container {
   position: absolute;
@@ -109,30 +110,30 @@
 }
 
 #output-threejs-container {
-    background-color: black!important;
+  background-color: black !important;
 }
 
 .panel {
-      position: fixed;
-      z-index: 1;
-      scrollbar-color: rgba(255,255,255, 1);
-      scrollbar-width: thin;
-      transition: 0.5s;
-}    
+  position: fixed;
+  z-index: 1;
+  scrollbar-color: rgba(255, 255, 255, 1);
+  scrollbar-width: thin;
+  transition: 0.5s;
+}
 
-.progress-line{
-  background: linear-gradient(217deg, rgba(127,127, 127,.8), rgba(255,0,0,0) 70.71%),
-        linear-gradient(127deg, rgba(0, 0, 0,.8), rgba(0,255,0,0) 70.71%),
-        linear-gradient(336deg, rgba(255, 255, 255,.8), rgba(0,0,255,0) 70.71%);
+.progress-line {
+  background: linear-gradient(217deg, rgba(127, 127, 127, .8), rgba(255, 0, 0, 0) 70.71%),
+    linear-gradient(127deg, rgba(0, 0, 0, .8), rgba(0, 255, 0, 0) 70.71%),
+    linear-gradient(336deg, rgba(255, 255, 255, .8), rgba(0, 0, 255, 0) 70.71%);
   top: 88%;
   left: 2.5%;
   max-width: 96%;
   height: 1.4vh;
   position: absolute;
   transition: 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-} 
+}
 
- /*****dat.GUI List Extention***/
+/*****dat.GUI List Extention***/
 
 .dropdown-check-list {
   display: none;
@@ -148,7 +149,8 @@
   display: inline-block;
   padding: 5px 50px 5px 10px;
   border: 1px solid #333;
-  width: 7.5vw; /* header width */
+  width: 7.5vw;
+  /* header width */
 }
 
 .dropdown-check-list .anchor:after {
@@ -179,16 +181,17 @@
   border-top: none;
   max-height: 20vh;
   height: auto;
-  width: 7.5vw; /* list width */
-  overflow: scroll;        
+  width: 7.5vw;
+  /* list width */
+  overflow: scroll;
 }
 
 .dropdown-check-list ul.items li {
   list-style: none;
-} 
+}
 
 label {
-    color: white;
-    font-family: Consolas, Baskerville, 'Segoe UI', sans-serif;
-    font-size: 10px;
-}  
+  color: white;
+  font-family: Consolas, Baskerville, 'Segoe UI', sans-serif;
+  font-size: 10px;
+}

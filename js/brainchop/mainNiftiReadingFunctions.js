@@ -14,7 +14,7 @@
 
 =========================================================
            Brainchop for 3D Brain Segmentation
-=========================================================*/  
+=========================================================*/
 
 
 /** For future use
@@ -31,17 +31,17 @@
 */
 
 normalizeNiftiImageData = (rawData) => {
-      let headerObj = readNiftiHeader(rawData);
-      let imageDataArrBuf = readNiftiImageData(headerObj, rawData);
-      let imageDataArr = arrayBuffer2Array(imageDataArrBuf, headerObj.datatypeCode);
+    let headerObj = readNiftiHeader(rawData);
+    let imageDataArrBuf = readNiftiImageData(headerObj, rawData);
+    let imageDataArr = arrayBuffer2Array(imageDataArrBuf, headerObj.datatypeCode);
 
-      //Round image data
-      let imageDataTensor = tf.round(tf.tensor1d(imageDataArr));
-      //Normalize image data
-      imageDataArr = tensor2Array(tf.mul(normalizeVolumeData(imageDataTensor), tf.scalar(255)));
+    //Round image data
+    let imageDataTensor = tf.round(tf.tensor1d(imageDataArr));
+    //Normalize image data
+    imageDataArr = tensor2Array(tf.mul(normalizeVolumeData(imageDataTensor), tf.scalar(255)));
 
-      return array2ArrayBuffer(imageDataArr);
-} 
+    return array2ArrayBuffer(imageDataArr);
+}
 
 /*
 * Function to check Nifti file  whether it needs resampling by use mri_convert.js
@@ -56,13 +56,13 @@ normalizeNiftiImageData = (rawData) => {
 
 isVoxelSize1mm = (niftiHeader) => {
 
-  for(let i = 1; i <= niftiHeader.dims[0]; i++) {
-      if(niftiHeader['pixDims'][i] != 1){
-         return false;
-      }
-  }
- 
-  return true;
+    for (let i = 1; i <= niftiHeader.dims[0]; i++) {
+        if (niftiHeader['pixDims'][i] != 1) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 /*
@@ -77,12 +77,11 @@ isVoxelSize1mm = (niftiHeader) => {
 
 isNiftiFileVerified = (niftiHeader) => {
 
-    if( (niftiHeader.dims[1]!= 256) || (niftiHeader.dims[2]!= 256) || (niftiHeader.dims[3]!= 256) || 
-       (niftiHeader['numBitsPerVoxel'] != 8) || (niftiHeader['datatypeCode'] != 2) ||
-        !isVoxelSize1mm(niftiHeader) )
-      {
-         return false;
-      } 
+    if ((niftiHeader.dims[1] != 256) || (niftiHeader.dims[2] != 256) || (niftiHeader.dims[3] != 256) ||
+        (niftiHeader['numBitsPerVoxel'] != 8) || (niftiHeader['datatypeCode'] != 2) ||
+        !isVoxelSize1mm(niftiHeader)) {
+        return false;
+    }
 
     return true;
 }
@@ -104,14 +103,14 @@ isNiftiFileVerified = (niftiHeader) => {
 */
 
 getNiftiRawData = (rawData) => {
-     
+
     // Parse nifti
     if (nifti.isCompressed(rawData)) {
         rawData = nifti.decompress(rawData);
     }
 
     return nifti.isNIFTI(rawData) ? rawData : null;
-}    
+}
 
 
 /**
@@ -127,8 +126,8 @@ getNiftiRawData = (rawData) => {
 */
 
 readNiftiHeader = (rawNiftiData) => {
-        return rawNiftiData ? nifti.readHeader(rawNiftiData) : null;
-} 
+    return rawNiftiData ? nifti.readHeader(rawNiftiData) : null;
+}
 
 /**
 * Function to read Nifti file image data
@@ -145,8 +144,8 @@ readNiftiHeader = (rawNiftiData) => {
 */
 
 readNiftiImageData = (niftiHeader, rawNiftiData) => {
-        return niftiHeader ? nifti.readImage(niftiHeader, rawNiftiData) : null;
-} 
+    return niftiHeader ? nifti.readImage(niftiHeader, rawNiftiData) : null;
+}
 
 /**
 * Create Nifti Output Array Buffer
@@ -187,7 +186,7 @@ createNiftiOutArrayBuffer = (rawData, data) => {
 
     outImageArray = headerArray.concat(data)
 
-    return    array2ArrayBuffer(outImageArray, header.datatypeCode); 
+    return array2ArrayBuffer(outImageArray, header.datatypeCode);
 };
 
 
@@ -202,30 +201,30 @@ createNiftiOutArrayBuffer = (rawData, data) => {
 * array2ArrayBuffer([1,2,3])
 * // => ArrayBuffer { byteLength: 3 }
 *
-*/ 
+*/
 
 array2ArrayBuffer = (array, datatypeCode) => {
-      let typedArray;
+    let typedArray;
 
-      if (datatypeCode === nifti.NIFTI1.TYPE_UINT8) {
-          typedArray =  Uint8Array.from(array);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_INT16) {
-          typedArray =  Int16Array.from(array);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_INT32) {
-          typedArray =  Int32Array.from(array);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_FLOAT32) {
-          typedArray =  Float32Array.from(array);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_FLOAT64) {
-          typedArray =  Float64Array.from(array);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_INT8) {
-          typedArray =  Int8Array.from(array);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_UINT16) {
-          typedArray =  Uint16Array.from(array);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_UINT32) {
-          typedArray =  Uint32Array.from(array);
-      } else {
-          return;
-      }  
+    if (datatypeCode === nifti.NIFTI1.TYPE_UINT8) {
+        typedArray = Uint8Array.from(array);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_INT16) {
+        typedArray = Int16Array.from(array);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_INT32) {
+        typedArray = Int32Array.from(array);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_FLOAT32) {
+        typedArray = Float32Array.from(array);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_FLOAT64) {
+        typedArray = Float64Array.from(array);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_INT8) {
+        typedArray = Int8Array.from(array);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_UINT16) {
+        typedArray = Uint16Array.from(array);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_UINT32) {
+        typedArray = Uint32Array.from(array);
+    } else {
+        return;
+    }
 
 
     // Convert typedArray to ArrayBuffer and return ArrayBuffer
@@ -246,30 +245,30 @@ array2ArrayBuffer = (array, datatypeCode) => {
 * arrayBuffer2Array( arrBuf)
 * // =>  [ 1, 2, 3 ]
 *
-*/ 
- 
-arrayBuffer2Array = (arrayBuffer, datatypeCode) => {
-      let typedArrData;
+*/
 
-      if (datatypeCode === nifti.NIFTI1.TYPE_UINT8) {
-          typedArrData = new Uint8Array(arrayBuffer);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_INT16) {
-          typedArrData = new Int16Array(arrayBuffer);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_INT32) {
-          typedArrData = new Int32Array(arrayBuffer);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_FLOAT32) {
-          typedArrData = new Float32Array(arrayBuffer);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_FLOAT64) {
-          typedArrData = new Float64Array(arrayBuffer);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_INT8) {
-          typedArrData = new Int8Array(arrayBuffer);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_UINT16) {
-          typedArrData = new Uint16Array(arrayBuffer);
-      } else if (datatypeCode === nifti.NIFTI1.TYPE_UINT32) {
-          typedArrData = new Uint32Array(arrayBuffer);
-      } else {
-          return;
-      }  
+arrayBuffer2Array = (arrayBuffer, datatypeCode) => {
+    let typedArrData;
+
+    if (datatypeCode === nifti.NIFTI1.TYPE_UINT8) {
+        typedArrData = new Uint8Array(arrayBuffer);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_INT16) {
+        typedArrData = new Int16Array(arrayBuffer);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_INT32) {
+        typedArrData = new Int32Array(arrayBuffer);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_FLOAT32) {
+        typedArrData = new Float32Array(arrayBuffer);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_FLOAT64) {
+        typedArrData = new Float64Array(arrayBuffer);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_INT8) {
+        typedArrData = new Int8Array(arrayBuffer);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_UINT16) {
+        typedArrData = new Uint16Array(arrayBuffer);
+    } else if (datatypeCode === nifti.NIFTI1.TYPE_UINT32) {
+        typedArrData = new Uint32Array(arrayBuffer);
+    } else {
+        return;
+    }
 
 
     // Convert typedArray to array using Spread syntax[...]
@@ -294,8 +293,8 @@ arrayBuffer2Array = (arrayBuffer, datatypeCode) => {
 *
 * // =>  [ 1, 2, 3 ]
 *
-*/ 
- 
+*/
+
 typedArray2Array = (typedArray) => {
     // Convert typedArray to array using Spread syntax[...]
     return [...typedArrData];
@@ -311,34 +310,34 @@ typedArray2Array = (typedArray) => {
 * @param {string} fileName 
 * @param {ArrayBuffer} rawNiftiData 
 *
-*/ 
+*/
 
 
-downloadNifti = (mriData, rawNiftiData, fileName ) => {
-      var downloadFileData = (function () {
+downloadNifti = (mriData, rawNiftiData, fileName) => {
+    var downloadFileData = (function () {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
         return function (data, fileName) {
             // create Blob "Binary Large Object" of type octet-binary for the ArrayBuffer
-            var blob = new Blob([data], {type: "application/octet-binary;charset=utf-8"});
+            var blob = new Blob([data], { type: "application/octet-binary;charset=utf-8" });
             var url = window.URL.createObjectURL(blob);
             a.href = url;
             a.download = fileName;
             a.click();
             window.URL.revokeObjectURL(url);
-            };
-     }());
+        };
+    }());
 
-     //Get the data ArrayBuffer
-     var data = createNiftiOutArrayBuffer(rawNiftiData, mriData);
+    //Get the data ArrayBuffer
+    var data = createNiftiOutArrayBuffer(rawNiftiData, mriData);
 
-     if (nifti.isNIFTI(data)) {
-          // save arraybuffer data to disk  
-          downloadFileData(data, fileName);
-      } else {
-          console.log("Not Nifti data....... ");
-      }   
+    if (nifti.isNIFTI(data)) {
+        // save arraybuffer data to disk  
+        downloadFileData(data, fileName);
+    } else {
+        console.log("Not Nifti data....... ");
+    }
 }
 
 
@@ -352,11 +351,11 @@ downloadNifti = (mriData, rawNiftiData, fileName ) => {
 *
 * downloadJsonObj( {1: "test1", 2: "test2"}, "test.json")
 *
-*/ 
+*/
 
 
-downloadJsonObj = (jsonObj, fileName ) => {
-      var downloadFileData = (function () {
+downloadJsonObj = (jsonObj, fileName) => {
+    var downloadFileData = (function () {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
@@ -366,15 +365,15 @@ downloadJsonObj = (jsonObj, fileName ) => {
             a.href = dataStr;
             a.download = fileName;
             a.click();
-            };
-     }());
+        };
+    }());
 
-     if (Object.keys(jsonObj).length) {
-          // save arraybuffer data to disk  
-          downloadFileData(jsonObj, fileName);
-      } else {
-          console.log("Not JSON  data found....... ");
-      }   
+    if (Object.keys(jsonObj).length) {
+        // save arraybuffer data to disk  
+        downloadFileData(jsonObj, fileName);
+    } else {
+        console.log("Not JSON  data found....... ");
+    }
 }
 
 
@@ -388,10 +387,10 @@ downloadJsonObj = (jsonObj, fileName ) => {
 *
 * downloadCanvas( papayaContainers[0].viewer.canvas, "slice125.png")
 *
-*/ 
+*/
 
 downloadCanvas = (canvas, fileName) => { // canvas : papayaContainers[0].viewer.canvas
-      var downloadFileData = (function () {
+    var downloadFileData = (function () {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
@@ -400,10 +399,10 @@ downloadCanvas = (canvas, fileName) => { // canvas : papayaContainers[0].viewer.
             a.href = image;
             a.download = fileName;
             a.click();
-            };
-     }());
+        };
+    }());
 
-     downloadFileData(canvas, fileName);
+    downloadFileData(canvas, fileName);
 }
 
 
@@ -419,19 +418,19 @@ downloadCanvas = (canvas, fileName) => { // canvas : papayaContainers[0].viewer.
 * labelMax( [1,2,3])
 * // => 3
 *
-*/ 
+*/
 
 labelMax = (arr) => {
-   let max = arr[0];
+    let max = arr[0];
 
-   for(let i=1; i < arr.length; i++) {
-       if(arr[i] > max) {
-         max = arr[i];   
-       }
+    for (let i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
     }
 
     return max;
-}  
+}
 
 
 /**
@@ -445,14 +444,14 @@ labelMax = (arr) => {
 * arrValuesFreq( [2, 2, 2, 2, 3])
 * // => Map(900) { 2 → 4, 3 → 1}
 *
-*/ 
+*/
 
 
-arrValuesFreq = (arr)=> {
-   let arrCopy = [...arr]; //clone
-   arrCopy.sort();
-   let resultMap =  arrCopy.reduce((acc, curr) => acc.set(curr, (acc.get(curr) || 0) + 1), new Map());
-   return resultMap;
+arrValuesFreq = (arr) => {
+    let arrCopy = [...arr]; //clone
+    arrCopy.sort();
+    let resultMap = arrCopy.reduce((acc, curr) => acc.set(curr, (acc.get(curr) || 0) + 1), new Map());
+    return resultMap;
 
 }
 
@@ -469,11 +468,11 @@ arrValuesFreq = (arr)=> {
 * map2Object(  new Map().set('a', 1).set('b', 2) )
 * // =>  Object { a: 1, b: 2 }
 *
-*/ 
+*/
 
 
-map2Object = (map)=> {
-   return Object.fromEntries(map);
+map2Object = (map) => {
+    return Object.fromEntries(map);
 }
 
 
@@ -483,10 +482,10 @@ map2Object = (map)=> {
 * @returns {bool} true/false
 * @example
 *
-*/ 
+*/
 
 isWinWorkerSupported = () => {
-  return window.Worker ? true : false;  
+    return window.Worker ? true : false;
 }
 
 
@@ -498,86 +497,86 @@ isWinWorkerSupported = () => {
 * @param {number} sliceIdx 
 * @param {object} labelNiftiHeader- The header of nifti file.
 * @param {ArrayBuffer} labelNiftiImage- The image data of nifti file.
-*/ 
+*/
 
 drawGtCanvas = (canvas, sliceIdx, labelNiftiHeader, labelNiftiImage) => {
-      // get nifti dimensions
-      let cols = labelNiftiHeader.dims[1];
-      let rows = labelNiftiHeader.dims[2];
+    // get nifti dimensions
+    let cols = labelNiftiHeader.dims[1];
+    let rows = labelNiftiHeader.dims[2];
 
-      // Set canvas dimensions to nifti slice dimensions
-      canvas.width = cols;
-      canvas.height = rows;
-     
+    // Set canvas dimensions to nifti slice dimensions
+    canvas.width = cols;
+    canvas.height = rows;
 
-      // Make canvas image data
-      let ctx = canvas.getContext("2d");
-      let canvasImageData = ctx.createImageData(canvas.width, canvas.height);
 
-      // Convert raw data to typed array based on nifti datatype
-      let typedData;
+    // Make canvas image data
+    let ctx = canvas.getContext("2d");
+    let canvasImageData = ctx.createImageData(canvas.width, canvas.height);
 
-      if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_UINT8) {
-          typedData = new Uint8Array(labelNiftiImage);
-      } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_INT16) {
-          typedData = new Int16Array(labelNiftiImage);
-      } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_INT32) {
-          typedData = new Int32Array(labelNiftiImage);
-      } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_FLOAT32) {
-          typedData = new Float32Array(labelNiftiImage);
-      } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_FLOAT64) {
-          typedData = new Float64Array(labelNiftiImage);
-      } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_INT8) {
-          typedData = new Int8Array(labelNiftiImage);
-      } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_UINT16) {
-          typedData = new Uint16Array(labelNiftiImage);
-      } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_UINT32) {
-          typedData = new Uint32Array(labelNiftiImage);
-      } else {
-          return;
-      }
+    // Convert raw data to typed array based on nifti datatype
+    let typedData;
 
-      
-      let n_classes = labelMax(typedData) + 1;
-      // offset to specified slice
-      let sliceSize = cols * rows;
-      let sliceOffset = sliceSize * sliceIdx;
+    if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_UINT8) {
+        typedData = new Uint8Array(labelNiftiImage);
+    } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_INT16) {
+        typedData = new Int16Array(labelNiftiImage);
+    } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_INT32) {
+        typedData = new Int32Array(labelNiftiImage);
+    } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_FLOAT32) {
+        typedData = new Float32Array(labelNiftiImage);
+    } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_FLOAT64) {
+        typedData = new Float64Array(labelNiftiImage);
+    } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_INT8) {
+        typedData = new Int8Array(labelNiftiImage);
+    } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_UINT16) {
+        typedData = new Uint16Array(labelNiftiImage);
+    } else if (labelNiftiHeader.datatypeCode === nifti.NIFTI1.TYPE_UINT32) {
+        typedData = new Uint32Array(labelNiftiImage);
+    } else {
+        return;
+    }
 
-      // draw pixels
-      for (let row = 0; row < rows; row++) {
-          let rowOffset = row * cols;
 
-          for (let col = 0; col < cols; col++) {
-              let offset = sliceOffset + rowOffset + col;
-              let value = typedData[offset];
+    let n_classes = labelMax(typedData) + 1;
+    // offset to specified slice
+    let sliceSize = cols * rows;
+    let sliceOffset = sliceSize * sliceIdx;
 
-              /* 
-                 Assumes data is 8-bit, otherwise you would need to first convert 
-                 to 0-255 range based on datatype range, data range (iterate through
-                 data to find), or display range (cal_min/max).
-                 
-                 Other things to take into consideration:
-                   - data scale: scl_slope and scl_inter, apply to raw value before 
-                     applying display range
-                   - orientation: displays in raw orientation, see nifti orientation 
-                     info for how to orient data
-                   - assumes voxel shape (pixDims) is isometric, if not, you'll need 
-                     to apply transform to the canvas
-                   - byte order: see littleEndian flag
-              */
-              value = Math.ceil(value*255/(n_classes - 1))
+    // draw pixels
+    for (let row = 0; row < rows; row++) {
+        let rowOffset = row * cols;
 
-              canvasImageData.data[(rowOffset + col) * 4] = value & 0xFF;
-              canvasImageData.data[(rowOffset + col) * 4 + 1] = value & 0xFF;
-              canvasImageData.data[(rowOffset + col) * 4 + 2] = value & 0xFF;
-              canvasImageData.data[(rowOffset + col) * 4 + 3] = 0xFF;
+        for (let col = 0; col < cols; col++) {
+            let offset = sliceOffset + rowOffset + col;
+            let value = typedData[offset];
 
-          }
-      }
+            /* 
+               Assumes data is 8-bit, otherwise you would need to first convert 
+               to 0-255 range based on datatype range, data range (iterate through
+               data to find), or display range (cal_min/max).
+               
+               Other things to take into consideration:
+                 - data scale: scl_slope and scl_inter, apply to raw value before 
+                   applying display range
+                 - orientation: displays in raw orientation, see nifti orientation 
+                   info for how to orient data
+                 - assumes voxel shape (pixDims) is isometric, if not, you'll need 
+                   to apply transform to the canvas
+                 - byte order: see littleEndian flag
+            */
+            value = Math.ceil(value * 255 / (n_classes - 1))
 
-      ctx.putImageData(canvasImageData, 0, 0);
+            canvasImageData.data[(rowOffset + col) * 4] = value & 0xFF;
+            canvasImageData.data[(rowOffset + col) * 4 + 1] = value & 0xFF;
+            canvasImageData.data[(rowOffset + col) * 4 + 2] = value & 0xFF;
+            canvasImageData.data[(rowOffset + col) * 4 + 3] = 0xFF;
 
-  }
+        }
+    }
+
+    ctx.putImageData(canvasImageData, 0, 0);
+
+}
 
 /**
 * Draw Ground Truth labels if any
@@ -588,29 +587,29 @@ drawGtCanvas = (canvas, sliceIdx, labelNiftiHeader, labelNiftiImage) => {
 * @param {number} length - File size
 * @returns {blob object}  
 *
-*/    
+*/
 
-  makeSlice = (file, start, length) => {
-      var fileType = (typeof File);
+makeSlice = (file, start, length) => {
+    var fileType = (typeof File);
 
-      if (fileType === 'undefined') {
-          return function () {};
-      }
+    if (fileType === 'undefined') {
+        return function () { };
+    }
 
-      if (File.prototype.slice) {
-          return file.slice(start, start + length);
-      }
+    if (File.prototype.slice) {
+        return file.slice(start, start + length);
+    }
 
-      if (File.prototype.mozSlice) {
-          return file.mozSlice(start, length);
-      }
+    if (File.prototype.mozSlice) {
+        return file.mozSlice(start, length);
+    }
 
-      if (File.prototype.webkitSlice) {
-          return file.webkitSlice(start, length);
-      }
+    if (File.prototype.webkitSlice) {
+        return file.webkitSlice(start, length);
+    }
 
-      return null;
-  }
+    return null;
+}
 
 
 

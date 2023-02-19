@@ -17,7 +17,7 @@
 
 =========================================================
                    mri_convert.js
-=========================================================*/ 
+=========================================================*/
 //--------------------------------------------------------------------------------//
 //-- Inspired from NIFTI-Reader-JS  https://github.com/rii-mango/NIFTI-Reader-JS--//
 //------------ Credit: Michael Martinez  https://github.com/martinezmj------------//
@@ -31,11 +31,11 @@
            NIFTI-1 header file.
            sizeof(int) = sizeof(float) = 4 ;  sizeof(short) = 2
  */
-                        /*************************/  /************************/
+/*************************/  /************************/
 //struct nifti_1_header { /* NIFTI-1 usage         */  /* ANALYZE 7.5 field(s) */
-                        /*************************/  /************************/
+/*************************/  /************************/
 
-                                           /*--- was header_key substruct ---*/
+/*--- was header_key substruct ---*/
 // int   sizeof_hdr;    /*!< MUST be 348           */  /* int sizeof_hdr;      */
 // char  data_type[10]; /*!< ++UNUSED++            */  /* char data_type[10];  */
 // char  db_name[18];   /*!< ++UNUSED++            */  /* char db_name[18];    */
@@ -44,14 +44,14 @@
 // char  regular;       /*!< ++UNUSED++            */  /* char regular;        */
 // char  dim_info;      /*!< MRI slice ordering.   */  /* char hkey_un0;       */
 
-                                      /*--- was image_dimension substruct ---*/
+/*--- was image_dimension substruct ---*/
 // short dim[8];        /*!< Data array dimensions.*/  /* short dim[8];        */
 // float intent_p1 ;    /*!< 1st intent parameter. */  /* short unused8;       */
-                                                     /* short unused9;       */
+/* short unused9;       */
 // float intent_p2 ;    /*!< 2nd intent parameter. */  /* short unused10;      */
-                                                     /* short unused11;      */
+/* short unused11;      */
 // float intent_p3 ;    /*!< 3rd intent parameter. */  /* short unused12;      */
-                                                     /* short unused13;      */
+/* short unused13;      */
 // short intent_code ;  /*!< NIFTI_INTENT_* code.  */  /* short unused14;      */
 // short datatype;      /*!< Defines data type!    */  /* short datatype;      */
 // short bitpix;        /*!< Number bits/voxel.    */  /* short bitpix;        */
@@ -70,13 +70,13 @@
 // int   glmax;         /*!< ++UNUSED++            */  /* int glmax;           */
 // int   glmin;         /*!< ++UNUSED++            */  /* int glmin;           */
 
-                                         /*--- was data_history substruct ---*/
+/*--- was data_history substruct ---*/
 // char  descrip[80];   /*!< any text you like.    */  /* char descrip[80];    */
 // char  aux_file[24];  /*!< auxiliary filename.   */  /* char aux_file[24];   */
 
 // short qform_code ;   /*!< NIFTI_XFORM_* code.   */  /*-- all ANALYZE 7.5 ---*/
 // short sform_code ;   /*!< NIFTI_XFORM_* code.   */  /*   fields below here  */
-                                                     /*   are replaced       */
+/*   are replaced       */
 // float quatern_b ;    /*!< Quaternion b param.   */
 // float quatern_c ;    /*!< Quaternion c param.   */
 // float quatern_d ;    /*!< Quaternion d param.   */
@@ -127,29 +127,29 @@
            data_type, db_name, extents, session_error, regular, glmax, glmin
 
       - the field ordering has been changed
------------------------------------------------------------------------------*/      
+-----------------------------------------------------------------------------*/
 
 //-- littleEndian : true or false
 
-setByteAt =  (dataView, start, value, littleEndian)  => {
-     dataView.setInt8(start, value, littleEndian);
+setByteAt = (dataView, start, value, littleEndian) => {
+    dataView.setInt8(start, value, littleEndian);
 };
 
-setShortAt =  (dataview, start, value, littleEndian)  => {
+setShortAt = (dataview, start, value, littleEndian) => {
     dataView.setInt16(start, value, littleEndian);
 };
 
-setIntAt =  (dataview, start, value, littleEndian)  => {
+setIntAt = (dataview, start, value, littleEndian) => {
     dataView.setInt32(start, value, littleEndian);
 };
 
 
-setFloatAt =  (dataview, start, value, littleEndian)  => {
+setFloatAt = (dataview, start, value, littleEndian) => {
     dataView.setFloat32(start, value, littleEndian);
 };
 
 
-setDoubleAt =  (dataview, start, value, littleEndian)  => {
+setDoubleAt = (dataview, start, value, littleEndian) => {
     dataView.setFloat64(start, value, littleEndian);
 };
 
@@ -163,11 +163,11 @@ setDoubleAt =  (dataview, start, value, littleEndian)  => {
  * @return {ArrayBuffer}
  */
 
-modifyNifti1_Header = (ArrBuf, newHdrObj) =>  {
+modifyNifti1_Header = (ArrBuf, newHdrObj) => {
 
     dataView = new DataView(ArrBuf);
     //--dataView:  DataView { buffer: ArrayBuffer, byteLength: xx, byteOffset: 0 }
-    
+
     let littleEndian = false;
 
     let magicCookieVal = nifti.Utils.getIntAt(dataView, 0, littleEndian);
@@ -179,7 +179,7 @@ modifyNifti1_Header = (ArrBuf, newHdrObj) =>  {
 
     if (magicCookieVal !== nifti.NIFTI1.MAGIC_COOKIE) {
         throw new Error("This does not appear to be a NIFTI file!");
-    }    
+    }
 
     setByteAt(dataView, 39, newHdrObj['dim_info'], littleEndian);
 
@@ -233,11 +233,11 @@ modifyNifti1_Header = (ArrBuf, newHdrObj) =>  {
  * @return {ArrayBuffer}
  */
 
-modifyNifti2_Header = (ArrBuf, newHdrObj) =>  {
+modifyNifti2_Header = (ArrBuf, newHdrObj) => {
 
     dataView = new DataView(ArrBuf);
     //--dataView:  DataView { buffer: ArrayBuffer, byteLength: xx, byteOffset: 0 }
-    
+
     let littleEndian = false;
 
     let magicCookieVal = nifti.Utils.getIntAt(dataView, 0, littleEndian);
@@ -249,7 +249,7 @@ modifyNifti2_Header = (ArrBuf, newHdrObj) =>  {
 
     if (magicCookieVal !== nifti.NIFTI2.MAGIC_COOKIE) {
         throw new Error("This does not appear to be a NIFTI file!");
-    }    
+    }
 
     setShortAt(dataView, 12, newHdrObj['datatypeCode'], littleEndian);
     setShortAt(dataView, 14, newHdrObj['numBitsPerVoxel'], littleEndian);
@@ -265,7 +265,7 @@ modifyNifti2_Header = (ArrBuf, newHdrObj) =>  {
         setDoubleAt(dataView, index, newHdrObj.pixDims[ctr], littleEndian);
     }
 
- 
+
 
     setIntAt(dataView, 344, newHdrObj['qform_code'], littleEndian);
     setIntAt(dataView, 348, newHdrObj['sform_code'], littleEndian);
@@ -285,7 +285,7 @@ modifyNifti2_Header = (ArrBuf, newHdrObj) =>  {
     }
 
 
-    setIntAt(dataView, 500, newHdrObj['xyzt_units'], littleEndian);    
+    setIntAt(dataView, 500, newHdrObj['xyzt_units'], littleEndian);
 
     setIntAt(dataView, 504, newHdrObj['intent_code'], littleEndian);
 
@@ -293,7 +293,7 @@ modifyNifti2_Header = (ArrBuf, newHdrObj) =>  {
 
 
     return dataView.buffer;
-};  
+};
 
 
 /**
@@ -304,39 +304,39 @@ modifyNifti2_Header = (ArrBuf, newHdrObj) =>  {
  */
 
 
-async function mri_convert(fileUrl,  rawNiftiFile) {
+async function mri_convert(fileUrl, rawNiftiFile) {
 
-         //-- To be accessed from python using js from import js, it should be global   
-         mriTempUrl =   fileUrl;
+    //-- To be accessed from python using js from import js, it should be global   
+    mriTempUrl = fileUrl;
 
-         niftiVer = nifti.isNIFTI1(rawNiftiFile) ? 1 : nifti.isNIFTI2(rawNiftiFile) ? 2 : null ;
+    niftiVer = nifti.isNIFTI1(rawNiftiFile) ? 1 : nifti.isNIFTI2(rawNiftiFile) ? 2 : null;
 
-         if(niftiVer == null) {
-             webix.alert("The file is not Nifti or corrupted ");
-             return 0;
-         }
+    if (niftiVer == null) {
+        webix.alert("The file is not Nifti or corrupted ");
+        return 0;
+    }
 
-         
-         try {
-            pyodide = await loadPyodide();
 
-          } catch (err) {
-               console.log(err);
-          }
+    try {
+        pyodide = await loadPyodide();
 
-         console.log("load pyodide")
+    } catch (err) {
+        console.log(err);
+    }
 
-         $$("mriConvPrgBarWin").show(); 
+    console.log("load pyodide")
 
-         document.getElementById("mriConvertProgBar").style.width=   "10%";
+    $$("mriConvPrgBarWin").show();
 
-         await pyodide.loadPackage("micropip");
-         await pyodide.loadPackage("scipy");
-         await pyodide.loadPackage("matplotlib");
+    document.getElementById("mriConvertProgBar").style.width = "10%";
 
-         document.getElementById("mriConvertProgBar").style.width=   "50%";
+    await pyodide.loadPackage("micropip");
+    await pyodide.loadPackage("scipy");
+    await pyodide.loadPackage("matplotlib");
 
-         await pyodide.runPythonAsync(`
+    document.getElementById("mriConvertProgBar").style.width = "50%";
+
+    await pyodide.runPythonAsync(`
 
                import micropip
 
@@ -808,102 +808,103 @@ async function mri_convert(fileUrl,  rawNiftiFile) {
       `);
 
 
-      //-----------------New Nifti Data ------------------//
-
-      
-      console.log("Get New Nifti Data")
-      let js_data = pyodide.globals.get('data').toJs()
-
-      //-- To avoid possible mem leak 
-      pyodide.globals.get('data').destroy();
-
-      console.log("Convert data array to tensor")
-      let data3DTensor = array2Tensor(js_data)
-      let dataArr1D = tensor2FlattenArray(  data3DTensor );
+    //-----------------New Nifti Data ------------------//
 
 
-      //-----------------New Nifti header ------------------//
-      let js_dim_info = pyodide.globals.get('dim_info');
-      //-- dims is array
-      let js_dims = pyodide.globals.get('dims').toJs();
-      let js_intent_code = pyodide.globals.get('intent_code');
-      let js_datatypeCode = pyodide.globals.get('datatypeCode');
-      let js_numBitsPerVoxel = pyodide.globals.get('numBitsPerVoxel');
-      //-- pixDims is array
-      let js_pixDims = pyodide.globals.get('pixDims').toJs();
-      let js_xyzt_units = pyodide.globals.get('xyzt_units');
-      let js_qform_code = pyodide.globals.get('qform_code');
-      let js_sform_code = pyodide.globals.get('sform_code');
-      let js_quatern_b = pyodide.globals.get('quatern_b');
-      let js_quatern_c = pyodide.globals.get('quatern_c');
-      let js_quatern_d = pyodide.globals.get('quatern_d');
-      let js_qoffset_x = pyodide.globals.get('qoffset_x');
-      let js_qoffset_y = pyodide.globals.get('qoffset_y');
-      let js_qoffset_z = pyodide.globals.get('qoffset_z');
-      //-- affine is array
-      let js_affine = pyodide.globals.get('affine').toJs(); 
+    console.log("Get New Nifti Data")
+    let js_data = pyodide.globals.get('data').toJs()
 
-      //-- To avoid possible mem leak 
-      pyodide.globals.get('dims').destroy();
-      pyodide.globals.get('pixDims').destroy();
-      pyodide.globals.get('affine').destroy();
-                                                                          
+    //-- To avoid possible mem leak 
+    pyodide.globals.get('data').destroy();
 
-      let new_hdr_values  = {  'dim_info': js_dim_info,
-                               'dims': js_dims,
-                               'intent_code': js_intent_code,
-                               'datatypeCode': js_datatypeCode,
-                               'numBitsPerVoxel': js_numBitsPerVoxel,
-                               'pixDims': js_pixDims,
-                               'xyzt_units': js_xyzt_units,
-                               'qform_code': js_qform_code,
-                               'sform_code': js_sform_code,
-                               'quatern_b': js_quatern_b,  
-                               'quatern_c': js_quatern_c,
-                               'quatern_d': js_quatern_d,
-                               'qoffset_x': js_qoffset_x,
-                               'qoffset_y': js_qoffset_y,
-                               'qoffset_z': js_qoffset_z,
-                               'affine': js_affine                                                                                                                                                                                                                                       
-                            }
-
-      console.log("new_hdr_values :", new_hdr_values)
+    console.log("Convert data array to tensor")
+    let data3DTensor = array2Tensor(js_data)
+    let dataArr1D = tensor2FlattenArray(data3DTensor);
 
 
-      if(niftiVer == 1) {
-          rawNiftiFile = modifyNifti1_Header(rawNiftiFile, new_hdr_values);
+    //-----------------New Nifti header ------------------//
+    let js_dim_info = pyodide.globals.get('dim_info');
+    //-- dims is array
+    let js_dims = pyodide.globals.get('dims').toJs();
+    let js_intent_code = pyodide.globals.get('intent_code');
+    let js_datatypeCode = pyodide.globals.get('datatypeCode');
+    let js_numBitsPerVoxel = pyodide.globals.get('numBitsPerVoxel');
+    //-- pixDims is array
+    let js_pixDims = pyodide.globals.get('pixDims').toJs();
+    let js_xyzt_units = pyodide.globals.get('xyzt_units');
+    let js_qform_code = pyodide.globals.get('qform_code');
+    let js_sform_code = pyodide.globals.get('sform_code');
+    let js_quatern_b = pyodide.globals.get('quatern_b');
+    let js_quatern_c = pyodide.globals.get('quatern_c');
+    let js_quatern_d = pyodide.globals.get('quatern_d');
+    let js_qoffset_x = pyodide.globals.get('qoffset_x');
+    let js_qoffset_y = pyodide.globals.get('qoffset_y');
+    let js_qoffset_z = pyodide.globals.get('qoffset_z');
+    //-- affine is array
+    let js_affine = pyodide.globals.get('affine').toJs();
 
-      } else {
-          rawNiftiFile = modifyNifti2_Header(rawNiftiFile, new_hdr_values); 
-      }
+    //-- To avoid possible mem leak 
+    pyodide.globals.get('dims').destroy();
+    pyodide.globals.get('pixDims').destroy();
+    pyodide.globals.get('affine').destroy();
 
 
-      rawNiftiFile = createNiftiOutArrayBuffer(rawNiftiFile, dataArr1D); 
+    let new_hdr_values = {
+        'dim_info': js_dim_info,
+        'dims': js_dims,
+        'intent_code': js_intent_code,
+        'datatypeCode': js_datatypeCode,
+        'numBitsPerVoxel': js_numBitsPerVoxel,
+        'pixDims': js_pixDims,
+        'xyzt_units': js_xyzt_units,
+        'qform_code': js_qform_code,
+        'sform_code': js_sform_code,
+        'quatern_b': js_quatern_b,
+        'quatern_c': js_quatern_c,
+        'quatern_d': js_quatern_d,
+        'qoffset_x': js_qoffset_x,
+        'qoffset_y': js_qoffset_y,
+        'qoffset_z': js_qoffset_z,
+        'affine': js_affine
+    }
+
+    console.log("new_hdr_values :", new_hdr_values)
 
 
-      document.getElementById("mriConvertProgBar").style.width=   "0%";    
+    if (niftiVer == 1) {
+        rawNiftiFile = modifyNifti1_Header(rawNiftiFile, new_hdr_values);
 
-      $$("mriConvPrgBarWin").hide();  
+    } else {
+        rawNiftiFile = modifyNifti2_Header(rawNiftiFile, new_hdr_values);
+    }
 
-      webix.confirm({
-        title:"",
-        ok:"Save", 
-        cancel:"Cancel",
+
+    rawNiftiFile = createNiftiOutArrayBuffer(rawNiftiFile, dataArr1D);
+
+
+    document.getElementById("mriConvertProgBar").style.width = "0%";
+
+    $$("mriConvPrgBarWin").hide();
+
+    webix.confirm({
+        title: "",
+        ok: "Save",
+        cancel: "Cancel",
         text: "Saving a copy of input MRI file after resampled ?",
-        width:500
-      })
+        width: 500
+    })
         .then(() => {
-               //---
-                downloadNifti(dataArr1D, rawNiftiFile, "converted_" + refFileName);
-            
-      })
+            //---
+            downloadNifti(dataArr1D, rawNiftiFile, "converted_" + refFileName);
+
+        })
         .fail(() => {
 
-      });   
+        });
 
 
-      return rawNiftiFile;   
-      
+    return rawNiftiFile;
+
 
 
 } //-- End of mri_convert function
