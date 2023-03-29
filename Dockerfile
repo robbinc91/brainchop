@@ -1,5 +1,12 @@
-FROM nginx
-COPY . /usr/share/nginx/html
+# syntax=docker/dockerfile:1
 
-FROM apache
-COPY . /var/www/html
+FROM python:n 3.9.12
+
+WORKDIR /brainchop
+
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+
+COPY . .
+
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
