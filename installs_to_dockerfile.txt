@@ -1,13 +1,11 @@
 pip install antspyx
 pip install tensorflow==2.5.0
 pip install keras==2.4.3
-pip install nibabel==4.0.1
 pip install scipy==1.7.3
 pip install pyrobex
 pip install fslpy
 pip install SimpleITK==2.1.1.2
 pip install matplotlib==3.5.1
-pip install flask==1.1.2
 
 
 pip install git+https://www.github.com/keras-team/keras-contrib.git
