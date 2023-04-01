@@ -21,6 +21,11 @@
 //---------- initialize Globals-------//  
 
 
+var loadedMRI = false;
+var loadedMRI2 = false;
+var loadedLabel = false;
+var loadedLabel2 = false;
+
 //Raw Nifti Data and header
 var rawNiftiData = [];
 var rawNiftiData2 = [];

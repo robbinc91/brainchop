@@ -89,7 +89,6 @@
 
           },
 
-
           {
             cols: [
               {},
@@ -108,9 +107,6 @@
 
         ]
       }
-
-
-
 
       // About Window to select local model
       webix.ui({
@@ -195,8 +191,6 @@
 
 
       //--------------Preprocessing Options -------------//
-
-
       clearInputThreejsWin = () => {
         if (inputSceneRendered) {
           clearScene(inputScene);
@@ -309,8 +303,6 @@
         ]
       }
 
-
-
       // Welcome Window
       let inputThreejsWinForm = {
         view: "form", id: "inputThreejsWinFormId", elements: [
@@ -321,13 +313,8 @@
                 view: "template", template: "  <div id='input-threejs-container'> <div id='input_gui_container'></div> <div id='inputLoadingIconDiv' class ='panel' style='top: 50%; left: 50%; ' >  <i id='inputLoadingIcon' style='font-size:1.4vw; color: gray; background-color: rgba(0,0,0,0);'  class='w3-xxxlarge w3-spin fa fa-refresh' ></i> </div> </div> <div id='progressLine' class='progress-line'></div>",
 
               }
-
             ]
-
           },
-
-
-
           {
             cols: [
               {},
@@ -358,8 +345,6 @@
 
         ]
       }
-
-
 
       webix.ui({
         view: "window",
@@ -440,12 +425,12 @@
           {
             cols: [
               {
-                view: "label", label: "Load NIfTI",
+                view: "label", label: "Load NIfTI Files",
                 align: "left"
               },
 
               {
-                view: "uploader", value: "Browse T1", width: 100, id: "imageUploader",
+                view: "uploader", value: "T1", width: 100, id: "imageUploader",
                 css: "bt_1",
                 align: "left",
                 accept: "image/nii, image/nii.gz",
@@ -522,86 +507,11 @@
                           statData["Vox_1mm"] = isVoxelSize1mm(niftiHeader);
                           statData["File_Verified"] = isNiftiFileVerified(niftiHeader);
                           //-- Check if Nifti file is already converted and no need to mri_convert.js
-                          if (!isNiftiFileVerified(niftiHeader)) {
 
-                            let reasonTxt = "", actionTxt = "", actionCounter = 0;
-                            //-- Check  Nifti file shape
-                            if ((niftiHeader.dims[1] != 256) || (niftiHeader.dims[2] != 256) || (niftiHeader.dims[3] != 256)) {
-                              reasonTxt = " <br> Image shape should be 256x256x256.<br>";
-                              actionTxt = "reshaped";
-                              actionCounter += 1;
-                              $$("segmentBtn").disable();
-                            }
-                            //-- Check  Nifti file data type 
-                            if ((niftiHeader['numBitsPerVoxel'] != 8) || (niftiHeader['datatypeCode'] != 2)) {
-                              reasonTxt = reasonTxt + " <br> Data type should be integer in range 0-255.<br>";
-                              if (actionCounter) { actionTxt += "/" }
-                              actionTxt += "scaled ";
-                              actionCounter += 1;
-                              $$("segmentBtn").disable();
-                            }
+                          loadedMRI = true;
+                          if (checkGPU()) {
+                            $$("segmentBtn").enable();
 
-                            //-- Check  Nifti file data type 
-                            if (!isVoxelSize1mm(niftiHeader)) {
-                              reasonTxt = reasonTxt + " <br> Voxels should be 1x1x1 mm thickness.<br>";
-                              if (actionCounter) { actionTxt += "/" }
-                              actionTxt += "resampled ";
-                              actionCounter += 1;
-                              $$("segmentBtn").disable();
-                            }
-
-                            let alertTxt = "MRI needs to be " + actionTxt.bold() + " for proper results. <br>" + reasonTxt.fontcolor("red").bold() + " <br> For more information please refer to  <a href='https://github.com/neuroneural/brainchop/wiki/Input-Data' target='_blank'><b>Input Data</b></a> section.";
-
-                            webix.confirm({
-                              title: "",
-                              ok: "Apply",
-                              cancel: "Cancel",
-                              type: "confirm-error",
-                              width: 500,
-                              text: alertTxt
-                            })
-                              .then(() => {
-                                //---
-                                console.log("Starting mri_convert")
-                                let blob = new Blob(params_mri["binaryImages"], { type: "application/octet-binary;charset=utf-8" });
-                                let rawImgurl = window.URL.createObjectURL(blob);
-
-                                mri_convert(rawImgurl, rawNiftiData).then(function (res) {
-                                  rawNiftiData = res;
-                                  niftiHeader = readNiftiHeader(rawNiftiData);
-                                  niftiImage = readNiftiImageData(niftiHeader, rawNiftiData);
-
-                                  params_mri["binaryImages"] = [rawNiftiData];
-                                  papaya.Container.resetViewer(0, params_mri);
-
-                                  // If still not correctly converted
-                                  if (!isNiftiFileVerified(niftiHeader)) {
-                                    webix.alert(" File can not be resampled. <br> For more options please refer to  <a href='https://github.com/neuroneural/brainchop/wiki/Input-Data' target='_blank'><b>Input Data</b></a> section.");
-
-                                    statData["Resampled"] = false;
-                                    submitTiming2GoogleSheet(statData);
-
-                                  } else {
-
-                                    statData["Resampled"] = true;
-                                  }
-                                  // enable it for all cases 
-                                  $$("segmentBtn").enable();
-
-                                });
-                              })
-                              .fail(() => {
-                                //---
-                                $$("segmentBtn").disable();
-                                statData["Brainchop_Ver"] = "Cancelled"
-                                submitTiming2GoogleSheet(statData);
-                              });
-
-                          } else { // Not varified file
-
-                            if (checkGPU()) {
-                              $$("segmentBtn").enable();
-                            }
                           }
 
                           numOfOverlays = 0;
@@ -621,9 +531,112 @@
                       webix.message("Select Nifti file *.nii / *.nii.gz")
 
                     }
-
                     return false;
+                  }
+                }
+              },
+              {
+                view: "uploader", value: "Labels", width: 100, id: "imageUploader1",
+                css: "bt_1",
+                align: "left",
+                accept: "image/nii, image/nii.gz",
+                autosend: false,
+                multiple: false,
+                on: {
+                  onBeforeFileAdd: function (upload) {
+                    let file = upload.file;
+                    //--file{name: "test.nii", lastModified: 1548792883000, webkitRelativePath: "", size: 503010, type: ""}
+                    if (file["name"].search(".nii") > 0) {
 
+                      refFileName = file["name"];
+
+                      let reader = new FileReader();
+
+                      var blob = makeSlice(file, 0, file.size);
+
+                      loadedLabel = true;
+
+                      reader.onloadend = function (event) {
+
+                        if (event.target.readyState === FileReader.DONE) {
+                          //--evt.target.result is :  ArrayBuffer { byteLength: 763810 }
+
+                          // params_mri["files"] = [file]; 
+                          // Or
+                          params_mri["binaryImages"].push(event.target.result);
+
+                          // Set 0 for MRI viewer 
+                          papaya.Container.resetViewer(0, params_mri);
+                          papaya.Container.atlas = null;
+                          // Set 1 for label viewer, need this step to remove startup image
+                          // papaya.Container.resetViewer(1);
+
+                          let startTime = performance.now();
+                          // decompress/check uploaded Nifti data
+                          rawNiftiData = getNiftiRawData(event.target.result);
+
+                          if (rawNiftiData == null) {
+                            let loadingErrorTxt = "This file not Nifti or corrupted. Please try again";
+
+                            webix.alert({
+                              type: "alert-error",
+                              width: "35%",
+                              text: loadingErrorTxt
+                            });
+
+                            $$("segmentBtn").disable();
+                            // Disable input 3d preprocess button
+                            $$("inputPrepIcon").disable();
+                            document.getElementById("preprocessIcon").style.opacity = 0.3;
+                            document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
+                            return 0;
+                          }
+
+                          // If new MRI loaded, clear last 3D window if rendered before.
+                          clearInputThreejsWin();
+                          $$("inputPrepIcon").enable();
+                          document.getElementById("preprocessIcon").style.opacity = 0.9;
+                          document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
+
+                          niftiHeader = readNiftiHeader(rawNiftiData);
+                          niftiImage = readNiftiImageData(niftiHeader, rawNiftiData);
+
+                          statData["Data_Load"] = ((performance.now() - startTime) / 1000).toFixed(4);
+                          statData["Resampled"] = null;
+
+                          statData["File_Type"] = nifti.isNIFTI1(rawNiftiData) ? "NIFTI-1" : nifti.isNIFTI2(rawNiftiData) ? "NIFTI-2" : "NOT-NIFTI";
+                          statData["Img_Size"] = JSON.stringify([niftiHeader.dims[1], niftiHeader.dims[2], niftiHeader.dims[3]]);
+                          statData["Num_Bits_Per_Voxel"] = niftiHeader['numBitsPerVoxel'];
+                          statData["Data_Type_Code"] = niftiHeader['datatypeCode'];
+                          statData["Vox_Offset"] = niftiHeader['vox_offset'];
+                          statData["Vox_1mm"] = isVoxelSize1mm(niftiHeader);
+                          statData["File_Verified"] = isNiftiFileVerified(niftiHeader);
+                          //-- Check if Nifti file is already converted and no need to mri_convert.js
+
+                          loadedMRI = true;
+                          if (checkGPU()) {
+                            $$("segmentBtn").enable();
+
+                          }
+
+                          numOfOverlays = 0;
+                          $$("downloadBtn").disable();
+                          $$("out3DIcon").disable();
+                          $$("outChartIcon").disable();
+                          document.getElementById("out3D-1").style.opacity = 0.3;
+                          document.getElementById("outChart-1").style.opacity = 0.3;
+                          document.getElementById("out3D-1").style.filter = "alpha(opacity=30)";
+                          document.getElementById("outChart-1").style.filter = "alpha(opacity=30)";
+                        }
+                      };
+
+                      reader.readAsArrayBuffer(blob);
+
+                    } else {
+                      webix.message("Select Nifti file *.nii / *.nii.gz")
+
+                    }
+                    return false;
                   }
                 }
               }
@@ -637,15 +650,15 @@
           {
             cols: [
               {
-                view: "label", label: "Load NIfTI",
+                view: "label", label: "Load NIfTI files",
                 align: "left"
               },
 
               {
-                view: "uploader", value: "Browse T1", width: 100, id: "imageUploader2",
+                view: "uploader", value: "T1", width: 100, id: "imageUploader2",
 
                 css: "bt_1",
-                align: "left",
+                // align: "left",
                 accept: "image/nii, image/nii.gz",
                 autosend: false,
                 multiple: false,
@@ -720,88 +733,11 @@
                           statData2["Vox_1mm"] = isVoxelSize1mm(niftiHeader2);
                           statData2["File_Verified"] = isNiftiFileVerified(niftiHeader2);
                           //-- Check if Nifti file is already converted and no need to mri_convert.js
-                          if (!isNiftiFileVerified(niftiHeader2)) {
 
-                            let reasonTxt = "", actionTxt = "", actionCounter = 0;
-                            //-- Check  Nifti file shape
-                            if ((niftiHeader2.dims[1] != 256) || (niftiHeader2.dims[2] != 256) || (niftiHeader2.dims[3] != 256)) {
-                              reasonTxt = " <br> Image shape should be 256x256x256.<br>";
-                              actionTxt = "reshaped";
-                              actionCounter += 1;
-                              $$("segmentBtn").disable();
-                            }
-                            //-- Check  Nifti file data type 
-                            if ((niftiHeader2['numBitsPerVoxel'] != 8) || (niftiHeader2['datatypeCode'] != 2)) {
-                              reasonTxt = reasonTxt + " <br> Data type should be integer in range 0-255.<br>";
-                              if (actionCounter) { actionTxt += "/" }
-                              actionTxt += "scaled ";
-                              actionCounter += 1;
-                              $$("segmentBtn").disable();
-                            }
+                          loadedMRI2 = true;
 
-                            //-- Check  Nifti file data type 
-                            if (!isVoxelSize1mm(niftiHeader2)) {
-                              reasonTxt = reasonTxt + " <br> Voxels should be 1x1x1 mm thickness.<br>";
-                              if (actionCounter) { actionTxt += "/" }
-                              actionTxt += "resampled ";
-                              actionCounter += 1;
-                              $$("segmentBtn").disable();
-                            }
-
-                            let alertTxt = "MRI needs to be " + actionTxt.bold() + " for proper results. <br>" + reasonTxt.fontcolor("red").bold() + " <br> For more information please refer to  <a href='https://github.com/neuroneural/brainchop/wiki/Input-Data' target='_blank'><b>Input Data</b></a> section.";
-
-
-                            webix.confirm({
-                              title: "",
-                              ok: "Apply",
-                              cancel: "Cancel",
-                              type: "confirm-error",
-                              width: 500,
-                              text: alertTxt
-                            })
-                              .then(() => {
-                                //---
-                                console.log("Starting mri_convert")
-                                let blob = new Blob(params_mri2["binaryImages"], { type: "application/octet-binary;charset=utf-8" });
-                                let rawImgurl = window.URL.createObjectURL(blob);
-
-                                mri_convert(rawImgurl, rawNiftiData2).then(function (res) {
-                                  rawNiftiData2 = res;
-                                  niftiHeader2 = readNiftiHeader(rawNiftiData2);
-                                  niftiImage2 = readNiftiImageData(niftiHeader2, rawNiftiData2);
-
-                                  params_mri2["binaryImages"] = [rawNiftiData2];
-                                  papaya.Container.resetViewer(1, params_mri2);
-
-                                  // If still not correctly converted
-                                  if (!isNiftiFileVerified(niftiHeader2)) {
-                                    webix.alert(" File can not be resampled. <br> For more options please refer to  <a href='https://github.com/neuroneural/brainchop/wiki/Input-Data' target='_blank'><b>Input Data</b></a> section.");
-
-                                    statData2["Resampled"] = false;
-                                    submitTiming2GoogleSheet(statData);
-
-                                  } else {
-
-                                    statData2["Resampled"] = true;
-                                  }
-                                  // enable it for all cases 
-                                  $$("segmentBtn").enable();
-
-
-                                });
-
-                              })
-                              .fail(() => {
-                                //---
-                                $$("segmentBtn").disable();
-                                statData2["Brainchop_Ver"] = "Cancelled"
-                                submitTiming2GoogleSheet(statData2);
-                              });
-
-                          } else { // Not varified file
-                            if (checkGPU()) {
-                              $$("segmentBtn").enable();
-                            }
+                          if (checkGPU()) {
+                            $$("segmentBtn").enable();
                           }
 
                           numOfOverlays = 0;
@@ -826,7 +762,114 @@
 
                   }
                 }
-              }
+              },
+              {
+                view: "uploader", value: "Labels", width: 100, id: "imageUploader3",
+
+                css: "bt_1",
+                // align: "left",
+                accept: "image/nii, image/nii.gz",
+                autosend: false,
+                multiple: false,
+                on: {
+                  onBeforeFileAdd: function (upload) {
+                    let file = upload.file;
+                    //--file{name: "test.nii", lastModified: 1548792883000, webkitRelativePath: "", size: 503010, type: ""}
+                    if (file["name"].search(".nii") > 0) {
+
+                      refFileName = file["name"];
+
+                      let reader = new FileReader();
+
+                      var blob = makeSlice(file, 0, file.size);
+
+                      reader.onloadend = function (event) {
+
+                        if (event.target.readyState === FileReader.DONE) {
+                          //--evt.target.result is :  ArrayBuffer { byteLength: 763810 }
+
+                          // params_mri["files"] = [file]; 
+                          // Or
+                          params_mri2["binaryImages"].push(event.target.result);
+
+                          // Set 1 for MRI viewer 
+                          papaya.Container.resetViewer(1, params_mri2);
+                          papaya.Container.atlas = null;
+                          // Set 3 for label viewer, need this step to remove startup image
+                          // papaya.Container.resetViewer(3);
+
+                          let startTime = performance.now();
+                          // decompress/check uploaded Nifti data
+                          rawNiftiData2 = getNiftiRawData(event.target.result);
+
+                          if (rawNiftiData2 == null) {
+                            let loadingErrorTxt = "This file not Nifti or corrupted. Please try again";
+
+                            webix.alert({
+                              type: "alert-error",
+                              width: "35%",
+                              text: loadingErrorTxt
+                            });
+
+                            $$("segmentBtn").disable();
+                            // Disable input 3d preprocess button
+                            $$("inputPrepIcon").disable();
+                            document.getElementById("preprocessIcon").style.opacity = 0.3;
+                            document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
+                            return 0;
+                          }
+
+                          // If new MRI loaded, clear last 3D window if rendered before.
+                          clearInputThreejsWin();
+                          $$("inputPrepIcon").enable();
+                          document.getElementById("preprocessIcon").style.opacity = 0.9;
+                          document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
+
+                          niftiHeader2 = readNiftiHeader(rawNiftiData2);
+                          niftiImage2 = readNiftiImageData(niftiHeader2, rawNiftiData2);
+
+                          statData2["Data_Load"] = ((performance.now() - startTime) / 1000).toFixed(4);
+                          statData2["Resampled"] = null;
+
+                          statData2["File_Type"] = nifti.isNIFTI1(rawNiftiData2) ? "NIFTI-1" : nifti.isNIFTI2(rawNiftiData2) ? "NIFTI-2" : "NOT-NIFTI";
+                          statData2["Img_Size"] = JSON.stringify([niftiHeader2.dims[1], niftiHeader2.dims[2], niftiHeader2.dims[3]]);
+                          statData2["Num_Bits_Per_Voxel"] = niftiHeader2['numBitsPerVoxel'];
+                          statData2["Data_Type_Code"] = niftiHeader2['datatypeCode'];
+                          statData2["Vox_Offset"] = niftiHeader2['vox_offset'];
+                          statData2["Vox_1mm"] = isVoxelSize1mm(niftiHeader2);
+                          statData2["File_Verified"] = isNiftiFileVerified(niftiHeader2);
+                          //-- Check if Nifti file is already converted and no need to mri_convert.js
+
+                          loadedLabel2 = true;
+
+                          if (checkGPU()) {
+                            $$("segmentBtn").enable();
+                          }
+
+                          numOfOverlays = 0;
+                          $$("downloadBtn").disable();
+                          $$("out3DIcon").disable();
+                          $$("outChartIcon").disable();
+                          document.getElementById("out3D-1").style.opacity = 0.3;
+                          document.getElementById("outChart-1").style.opacity = 0.3;
+                          document.getElementById("out3D-1").style.filter = "alpha(opacity=30)";
+                          document.getElementById("outChart-1").style.filter = "alpha(opacity=30)";
+                        }
+                      };
+
+                      reader.readAsArrayBuffer(blob);
+
+                    } else {
+                      webix.message("Select Nifti file *.nii / *.nii.gz")
+
+                    }
+
+                    return false;
+
+                  }
+                }
+              },
+              
             ]
           }
         ]
@@ -881,8 +924,6 @@
                   }
                 }
               }
-
-
             ]
           },
 
@@ -2024,8 +2065,6 @@
         ]
       }
 
-
-
       // Output labels histogram Window 
       webix.ui({
         view: "window",
@@ -2049,7 +2088,6 @@
         body: histogramWindowForm
 
       })
-
 
       //-------------------------------------------------------//
       //-------------------------Main--------------------------//
@@ -2078,7 +2116,7 @@
               {
                 rows: [
                   {
-                    type: "header", template: "Original MRI  Viewer",
+                    type: "header", template: "MRI  Viewer",
                     css: "headerclass"
                   },
                   { view: "template", content: "papayaMriDiv", borderless: true },
@@ -2094,7 +2132,7 @@
               {
                 rows: [
                   {
-                    type: "header", template: "Original MRI  Viewer",
+                    type: "header", template: "Comparative View",
                     css: "headerclass",
                   },
                   { view: "template", content: "papayaMriDiv2", borderless: true },
