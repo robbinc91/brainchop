@@ -5437,12 +5437,6 @@
 
             }
 
-            //  //-- Atlas version check              
-            // if ( (batch_D > 30) && (batch_H == 256) && (batch_W == 256) ) {
-            //       webix.alert("The subvolume dimension in z-axis shouldn't exceed 30 number of slices for browser limitation");
-            //       return 0;
-            // } 
-
             //--Check whether the model will make inference at once as FullVolumeModel 
             let isModelFullVol;
 
@@ -5453,7 +5447,6 @@
                 isModelFullVol = false;
 
             }
-
 
             let modelNumLayers = modelObject.layers.length;
             // Model output number of segmentations
@@ -5510,8 +5503,6 @@
                 statData["City"] = "";
             }
 
-
-
             statData["Date"] = parseInt(today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear();
             statData["Time"] = checkZero(today.getHours()) + ":" + checkZero(today.getMinutes()) + ":" + checkZero(today.getSeconds());
             statData["File_Name"] = refFileName == "" ? opts.uiSampleName : refFileName;
@@ -5535,7 +5526,6 @@
             statData["CPU_Cores"] = getCPUNumCores();
             statData["TF_Backend"] = tf.getBackend();
 
-
             //-- Init 
             statData["Actual_Labels"] = Infinity;
             statData["Expect_Labels"] = Infinity;
@@ -5547,7 +5537,6 @@
             statData["Error_Type"] = null;
             statData["Extra_Err_Info"] = null;
             statData["Extra_Info"] = null;
-
 
             if (isChrome()) {
                 statData["Heap_Size_MB"] = window.performance.memory["totalJSHeapSize"] / (1024 * 1024).toFixed(2);

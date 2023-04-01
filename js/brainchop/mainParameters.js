@@ -23,16 +23,22 @@
 
 //Raw Nifti Data and header
 var rawNiftiData = [];
+var rawNiftiData2 = [];
 //Object    
 var niftiHeader = [];
+var niftiHeader2 = [];
 //ArrayBuffer
 var niftiImage = [];
+var niftiImage2 = [];
 //Object
 var labelNiftiHeader = [];
+var labelNiftiHeader2 = [];
 //ArrayBuffer
 var labelNiftiImage = [];
+var labelNiftiImage2 = [];
 //Flag for futur use
 var gtLabelLoaded = false;
+var gtLabelLoaded2 = false;
 
 // Nifti file to load *.nii
 var refFileName = '';
@@ -89,6 +95,17 @@ var opts = {
 
 // Statistical data to analysis client performance
 var statData = {
+     Brainchop_Ver: null, Country: null, State: null, City: null, Date: null, Time: null,
+     File_Name: null, Img_Size: null, Num_Bits_Per_Voxel: null, Data_Type_Code: null, Vox_Offset: null, Vox_1mm: null, Resampled: null, File_Verified: null,
+     Input_Shape: null, Output_Shape: null, Channel_Last: null, Model_Param: Infinity, Model_Layers: Infinity,
+     No_SubVolumes: null, Actual_Labels: Infinity, Expect_Labels: Infinity, NumLabels_Match: null,
+     Data_Load: null, Preprocess_t: null, Inference_t: null, Merge_t: null, Postprocess_t: null,
+     Model: null, Browser: null, Browser_Ver: null, OS: null, Texture_Size: null, Heap_Size_MB: Infinity, Used_Heap_MB: Infinity, Heap_Limit_MB: Infinity,
+     WebGL1: null, WebGL2: null, TF_Backend: null, GPU_Vendor: null, GPU_Vendor_Full: null,
+     GPU_Card: null, GPU_Card_Full: null, Status: null, CPU_Cores: null, Error_Type: null, Extra_Err_Info: null, Extra_Info: null
+};
+
+var statData2 = {
      Brainchop_Ver: null, Country: null, State: null, City: null, Date: null, Time: null,
      File_Name: null, Img_Size: null, Num_Bits_Per_Voxel: null, Data_Type_Code: null, Vox_Offset: null, Vox_1mm: null, Resampled: null, File_Verified: null,
      Input_Shape: null, Output_Shape: null, Channel_Last: null, Model_Param: Infinity, Model_Layers: Infinity,
@@ -333,6 +350,13 @@ params_mri["expandable"] = true;
 params_mri["kioskMode"] = false;
 params_mri["noNewFiles"] = true;
 
+var params_mri2 = [];
+params_mri2["worldSpace"] = false;
+params_mri2["expandable"] = true;
+// To hide the toolbar
+params_mri2["kioskMode"] = false;
+params_mri2["noNewFiles"] = true;
+
 papaya.Container.syncViewers = true;
 
 // Labels Viewer settings
@@ -343,6 +367,14 @@ params_label["expandable"] = true;
 params_label["kioskMode"] = false;
 params_label["noNewFiles"] = true;
 params_label["smoothDisplay"] = false;
+
+var params_label2 = [];
+params_label2["worldSpace"] = false;
+params_label2["expandable"] = true;
+// To hide the toolbar
+params_label2["kioskMode"] = false;
+params_label2["noNewFiles"] = true;
+params_label2["smoothDisplay"] = false;
 
 
 
