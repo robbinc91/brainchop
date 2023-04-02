@@ -47,6 +47,7 @@ var gtLabelLoaded2 = false;
 
 // Nifti file to load *.nii
 var refFileName = '';
+var refFileName2 = '';
 
 // When browsing to tfjs model with browse window
 var modelFile;
@@ -57,6 +58,7 @@ var browserModelList = [];
 
 // Number of overlay added to MRI viewer
 var numOfOverlays;
+var numOfOverlays2;
 
 var numOfModelsWithoutBrowse;
 
@@ -327,6 +329,7 @@ var inferenceModelsList = [
 
 //--For use with three.js
 var outVolumeStatus = { out3DArr: null, totalVolume: 0, labelsHistoObj: null, colorLutObj: null, labelsObj: null };
+var outVolumeStatus2 = { out3DArr: null, totalVolume: 0, labelsHistoObj: null, colorLutObj: null, labelsObj: null };
 
 //Heatmap colors, for reproduce:  https://www.w3schools.com/colors/colors_hsl.asp
 var manualColorsRange = [/*Red*/ "hsla(0,100%,50%)", /*Vermillion*/ "hsla(30,100%,50%)", /*Orange*/ "hsla(60,100%,50%)",

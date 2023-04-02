@@ -424,6 +424,63 @@
         view: "form", id: "referenceImage", elements: [
           {
             cols: [
+            {
+                view: "label", label: "Results Display Options",
+                align: "left"
+              },
+            {
+                view: "label",
+                id: "outChartIcon",
+                label: '<img src="css/svg/outChart-1.svg" id="outChart-1" style="opacity:0.3;filter:alpha(opacity=30);"/>',
+                css: { "color": "black !important", "font-weight": "bold", "cursor": "pointer" },
+                width: 25,
+                height: 25,
+                disabled: true,
+                click: function () {
+
+                  $$("labelsHistogramWinId").show();
+
+                }
+              },
+              {
+                view: "label",
+                id: "out3DIcon",
+                label: '<img src="css/svg/out3D-1.svg" id="out3D-1" style="opacity:0.3;filter:alpha(opacity=30);"/>',
+                css: { "color": "black !important", "font-weight": "bold", "cursor": "pointer" },
+                width: 25,
+                height: 25,
+                disabled: true,
+                click: function () {
+                  //-- $$("outputThreejsWinId").show(); 
+                  showThreejsWindow().then(res => {
+                    if (!outputSceneRendered) { // if false, will render scene and gui
+
+                      init(outVolumeStatus['out3DArr'], "outputThreejsWinId", 'output-threejs-container', "output_gui_container", outVolumeStatus['colorLutObj'], outVolumeStatus['labelsObj']);
+
+                      outputSceneRendered = true;
+                      document.getElementById("loadingIconDiv").style.display = "none";
+
+                    } else { // if already rendered
+                      output_gui.domElement.style.display = "";
+                    }
+                  })
+                }
+              },
+              {
+                view: "label",
+                label: '<img src="css/svg/info-circle-solid.svg"/>',
+                css: { "color": "black !important", "font-weight": "bold", "cursor": "pointer" },
+                width: 25,
+                height: 25,
+                click: function () {
+                  getOutputInfo();
+                }
+              },
+            ]
+          },
+          {
+            cols: [
+              
               {
                 view: "label", label: "Load NIfTI Files",
                 align: "left"
@@ -453,9 +510,9 @@
                         if (event.target.readyState === FileReader.DONE) {
                           //--evt.target.result is :  ArrayBuffer { byteLength: 763810 }
 
-                          // params_mri["files"] = [file]; 
+                          params_mri["files"] = [file];
                           // Or
-                          params_mri["binaryImages"] = [event.target.result];
+                          //params_mri["binaryImages"] = [event.target.result];
 
                           // Set 0 for MRI viewer 
                           papaya.Container.resetViewer(0, params_mri);
@@ -481,20 +538,21 @@
 
                             $$("segmentBtn").disable();
                             // Disable input 3d preprocess button
-                            $$("inputPrepIcon").disable();
-                            document.getElementById("preprocessIcon").style.opacity = 0.3;
-                            document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
+                            //$$("inputPrepIcon").disable();
+                            //document.getElementById("preprocessIcon").style.opacity = 0.3;
+                            //document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
                             return 0;
                           }
 
                           // If new MRI loaded, clear last 3D window if rendered before.
                           clearInputThreejsWin();
-                          $$("inputPrepIcon").enable();
-                          document.getElementById("preprocessIcon").style.opacity = 0.9;
-                          document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
+                          //$$("inputPrepIcon").enable();
+                          //document.getElementById("preprocessIcon").style.opacity = 0.9;
+                          //document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
 
                           niftiHeader = readNiftiHeader(rawNiftiData);
                           niftiImage = readNiftiImageData(niftiHeader, rawNiftiData);
+
 
                           statData["Data_Load"] = ((performance.now() - startTime) / 1000).toFixed(4);
                           statData["Resampled"] = null;
@@ -548,25 +606,27 @@
                     //--file{name: "test.nii", lastModified: 1548792883000, webkitRelativePath: "", size: 503010, type: ""}
                     if (file["name"].search(".nii") > 0) {
 
-                      refFileName = file["name"];
+                      //refFileName = file["name"];
 
                       let reader = new FileReader();
 
                       var blob = makeSlice(file, 0, file.size);
 
-                      loadedLabel = true;
+
 
                       reader.onloadend = function (event) {
 
                         if (event.target.readyState === FileReader.DONE) {
                           //--evt.target.result is :  ArrayBuffer { byteLength: 763810 }
 
-                          // params_mri["files"] = [file]; 
+                          params_mri["files"].push(file);
                           // Or
-                          params_mri["binaryImages"].push(event.target.result);
+                          //params_mri["binaryImages"].push(event.target.result);
+
+                          //var labelArrayBuffer = createNiftiOutArrayBuffer(rawNiftiData, event.target.result);
 
                           // Set 0 for MRI viewer 
-                          papaya.Container.resetViewer(0, params_mri);
+
                           papaya.Container.atlas = null;
                           // Set 1 for label viewer, need this step to remove startup image
                           // papaya.Container.resetViewer(1);
@@ -586,20 +646,77 @@
 
                             $$("segmentBtn").disable();
                             // Disable input 3d preprocess button
-                            $$("inputPrepIcon").disable();
-                            document.getElementById("preprocessIcon").style.opacity = 0.3;
-                            document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
+                            //$$("inputPrepIcon").disable();
+                            //document.getElementById("preprocessIcon").style.opacity = 0.3;
+                            //document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
                             return 0;
                           }
 
                           // If new MRI loaded, clear last 3D window if rendered before.
                           clearInputThreejsWin();
-                          $$("inputPrepIcon").enable();
-                          document.getElementById("preprocessIcon").style.opacity = 0.9;
-                          document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
+                          //$$("inputPrepIcon").enable();
+                          //document.getElementById("preprocessIcon").style.opacity = 0.9;
+                          //document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
 
                           niftiHeader = readNiftiHeader(rawNiftiData);
                           niftiImage = readNiftiImageData(niftiHeader, rawNiftiData);
+
+                          let intArray = arrayBuffer2Array(niftiImage, niftiHeader.datatypeCode)
+
+                          // TODO: implement this better  --> lut construction
+                          //var num_classes = 3//Math.max(...intArray)+1;
+                          //var colors = getCustomColorTable(num_classes);
+                          //params_mri[file["name"]] = {lut: colors.prototype, interpolation: false}
+
+
+                          papaya.Container.resetViewer(0, params_mri);
+                          outVolumeStatus['out3DArr'] = tf.tensor(intArray, [niftiHeader.dims[1], niftiHeader.dims[2], niftiHeader.dims[3]]).reverse(1).arraySync();
+                          console.log(outVolumeStatus['out3DArr']);
+
+
+                          let labelsHistogramMap = arrValuesFreq(intArray);
+                          let labelsHistoObj = map2Object(labelsHistogramMap);
+                          outVolumeStatus['labelsHistoObj'] = labelsHistoObj;
+
+                          //--Remvoe background volume
+                          delete labelsHistoObj['0'];
+                          let totalTissueVol = 0;
+                          Object.keys(labelsHistoObj).forEach((labelKey, idx) => {
+                            //-- Make sure to delete labelsHistoObj['0'] before
+                            totalTissueVol += labelsHistoObj[labelKey];
+                          })
+
+                          let colorLutObj = {};
+                          let labelsObj = {};
+
+                          let roiData = [];
+                          let roiLabels = [];
+                          let chartXaxisStep = 1;
+
+                          Object.keys(labelsHistoObj).forEach((labelKey, idx) => {
+                            colorLutObj[labelKey] = "rgb(" + labelKey + "," + labelKey + "," + labelKey + ")";
+                            labelsObj[labelKey] = labelKey;
+                          })
+
+
+                          Object.keys(labelsHistoObj).forEach((labelKey, idx) => {
+                            roiData.push({ y: labelsHistoObj[labelKey] * 1 / totalTissueVol, color: rgbToHex(getRgbObject(colorLutObj[labelKey])) });
+                            if (idx == 0 || idx == Math.round(Object.keys(labelsHistoObj).length * opts.chartXaxisStepPercent) || idx == Object.keys(labelsHistoObj).length - 1) {
+                              roiLabels[idx] = labelsObj[labelKey];
+                            }
+
+                          });
+
+                          chartXaxisStep = Math.round(Object.keys(labelsHistoObj).length * opts.chartXaxisStepPercent);
+
+                          outVolumeStatus['colorLutObj'] = colorLutObj;
+                          // To only show All make label null
+                          outVolumeStatus['labelsObj'] = null;
+
+                          $$("hchart").config.settings.xAxis.categories = roiLabels;
+                          $$("hchart").config.settings.xAxis.labels.step = chartXaxisStep;
+                          $$("hchart").config.settings.series[0].data = roiData;
+                          $$("hchart")._render();
 
                           statData["Data_Load"] = ((performance.now() - startTime) / 1000).toFixed(4);
                           statData["Resampled"] = null;
@@ -613,16 +730,16 @@
                           statData["File_Verified"] = isNiftiFileVerified(niftiHeader);
                           //-- Check if Nifti file is already converted and no need to mri_convert.js
 
-                          loadedMRI = true;
+                          loadedLabel = true;
                           if (checkGPU()) {
                             $$("segmentBtn").enable();
 
                           }
 
-                          numOfOverlays = 0;
-                          $$("downloadBtn").disable();
-                          $$("out3DIcon").disable();
-                          $$("outChartIcon").disable();
+                          numOfOverlays++;
+                          $$("downloadBtn").enable();
+                          $$("out3DIcon").enable();
+                          $$("outChartIcon").enable();
                           document.getElementById("out3D-1").style.opacity = 0.3;
                           document.getElementById("outChart-1").style.opacity = 0.3;
                           document.getElementById("out3D-1").style.filter = "alpha(opacity=30)";
@@ -668,7 +785,7 @@
                     //--file{name: "test.nii", lastModified: 1548792883000, webkitRelativePath: "", size: 503010, type: ""}
                     if (file["name"].search(".nii") > 0) {
 
-                      refFileName = file["name"];
+                      refFileName2 = file["name"];
 
                       let reader = new FileReader();
 
@@ -707,17 +824,17 @@
 
                             $$("segmentBtn").disable();
                             // Disable input 3d preprocess button
-                            $$("inputPrepIcon").disable();
-                            document.getElementById("preprocessIcon").style.opacity = 0.3;
-                            document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
+                            //$$("inputPrepIcon").disable();
+                            //document.getElementById("preprocessIcon").style.opacity = 0.3;
+                            //document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
                             return 0;
                           }
 
                           // If new MRI loaded, clear last 3D window if rendered before.
                           clearInputThreejsWin();
-                          $$("inputPrepIcon").enable();
-                          document.getElementById("preprocessIcon").style.opacity = 0.9;
-                          document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
+                          //$$("inputPrepIcon").enable();
+                          //document.getElementById("preprocessIcon").style.opacity = 0.9;
+                          //document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
 
                           niftiHeader2 = readNiftiHeader(rawNiftiData2);
                           niftiImage2 = readNiftiImageData(niftiHeader2, rawNiftiData2);
@@ -777,7 +894,7 @@
                     //--file{name: "test.nii", lastModified: 1548792883000, webkitRelativePath: "", size: 503010, type: ""}
                     if (file["name"].search(".nii") > 0) {
 
-                      refFileName = file["name"];
+                      //refFileName = file["name"];
 
                       let reader = new FileReader();
 
@@ -794,6 +911,7 @@
 
                           // Set 1 for MRI viewer 
                           papaya.Container.resetViewer(1, params_mri2);
+                          console.log(params_mri2);
                           papaya.Container.atlas = null;
                           // Set 3 for label viewer, need this step to remove startup image
                           // papaya.Container.resetViewer(3);
@@ -813,17 +931,17 @@
 
                             $$("segmentBtn").disable();
                             // Disable input 3d preprocess button
-                            $$("inputPrepIcon").disable();
-                            document.getElementById("preprocessIcon").style.opacity = 0.3;
-                            document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
+                            //$$("inputPrepIcon").disable();
+                            //document.getElementById("preprocessIcon").style.opacity = 0.3;
+                            //document.getElementById("preprocessIcon").style.filter = "alpha(opacity=30)";
                             return 0;
                           }
 
                           // If new MRI loaded, clear last 3D window if rendered before.
                           clearInputThreejsWin();
-                          $$("inputPrepIcon").enable();
-                          document.getElementById("preprocessIcon").style.opacity = 0.9;
-                          document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
+                          //$$("inputPrepIcon").enable();
+                          //document.getElementById("preprocessIcon").style.opacity = 0.9;
+                          //document.getElementById("preprocessIcon").style.filter = "alpha(opacity=90)";
 
                           niftiHeader2 = readNiftiHeader(rawNiftiData2);
                           niftiImage2 = readNiftiImageData(niftiHeader2, rawNiftiData2);
@@ -869,7 +987,7 @@
                   }
                 }
               },
-              
+
             ]
           }
         ]
@@ -1454,6 +1572,14 @@
           "<i style='font-size:1.4vw'  class='fa fa-info-circle' ></i> <font style='font-size:0.77vw' >&nbsp&nbsp" + info + " </font>"
       }
 
+      getOutputInfo = () => {
+        
+        let info = '<p>Icon <img src="css/svg/outChart-1.svg" style="opacity:0.3;filter:alpha(opacity=30);width:15px;height:15px;"/> allows to see the histogram of labels occurring in the segmentation.</p><p>Icon <img src="css/svg/out3D-1.svg" style="opacity:0.3;filter:alpha(opacity=30);width:15px;height:15px;"/> allows to show a 3D view of the segmented labels.</p>';
+        $$("modelTooltip").show();
+        document.getElementById("tooltipDiv").innerHTML =
+          "<i style='font-size:1.4vw'  class='fa fa-info-circle' ></i> <font style='font-size:0.77vw' >&nbsp&nbsp" + info + " </font>"
+      }
+
       resestDependency = () => {
         //-- For future use
         document.getElementById("out3D-1").style.opacity = 0.3;
@@ -1648,10 +1774,6 @@
 
       let outputOptions = {
         view: "form", id: "OutputOptionsId", elements: [
-          // { type:"header", template:"Output Options",
-          //   css: "headerclass"
-          // },
-
           {
             cols: [
               {
@@ -1660,20 +1782,7 @@
                 align: "left"
               },
 
-              {
-                view: "label",
-                id: "outChartIcon",
-                label: '<img src="css/svg/outChart-1.svg" id="outChart-1" style="opacity:0.3;filter:alpha(opacity=30);"/>',
-                css: { "color": "black !important", "font-weight": "bold", "cursor": "pointer" },
-                width: 25,
-                height: 25,
-                disabled: true,
-                click: function () {
 
-                  $$("labelsHistogramWinId").show();
-
-                }
-              }
 
             ]
           },
@@ -1685,30 +1794,7 @@
                 id: "out3DLabel",
                 align: "left"
               },
-              {
-                view: "label",
-                id: "out3DIcon",
-                label: '<img src="css/svg/out3D-1.svg" id="out3D-1" style="opacity:0.3;filter:alpha(opacity=30);"/>',
-                css: { "color": "black !important", "font-weight": "bold", "cursor": "pointer" },
-                width: 25,
-                height: 25,
-                disabled: true,
-                click: function () {
-                  //-- $$("outputThreejsWinId").show(); 
-                  showThreejsWindow().then(res => {
-                    if (!outputSceneRendered) { // if false, will render scene and gui
 
-                      init(outVolumeStatus['out3DArr'], "outputThreejsWinId", 'output-threejs-container', "output_gui_container", outVolumeStatus['colorLutObj'], outVolumeStatus['labelsObj']);
-
-                      outputSceneRendered = true;
-                      document.getElementById("loadingIconDiv").style.display = "none";
-
-                    } else { // if already rendered
-                      output_gui.domElement.style.display = "";
-                    }
-                  })
-                }
-              }
 
             ]
           }
@@ -2028,7 +2114,6 @@
         ]
       };
 
-
       // Output labels histogram  form
       let histogramWindowForm = {
         view: "form", id: "histogramWindowFormId",
@@ -2043,6 +2128,7 @@
                 view: "button", value: "Ok", css: "bt_1", width: 100,
                 align: "center",
                 click: function () {
+                  //debugger;
                   $$("labelsHistogramWinId").hide();
                 }
               },
@@ -2093,10 +2179,10 @@
       //-------------------------Main--------------------------//
       //-------------------------------------------------------// 
 
-
       webix.ui({
         margin: 5,
-        rows: [toolbar,
+        rows: [
+          //toolbar,
           {
             margin: 20,
             padding: 20,
@@ -2107,7 +2193,7 @@
                   //referenceImage2,
                   //inputOptions,
                   Segmentation,
-                  outputOptions,
+                  //outputOptions,
                   downloadNiftiFile,
                   hardwareStatus,
                   {}
@@ -2121,11 +2207,6 @@
                   },
                   { view: "template", content: "papayaMriDiv", borderless: true },
                   referenceImage,
-                  /*{
-                    type: "header", template: "Original Labels Viewer",
-                    css: "headerclass",
-                  },
-                  { view: "template", content: "papayaLabelDiv", borderless: true },*/
                 ]
 
               },
@@ -2137,12 +2218,6 @@
                   },
                   { view: "template", content: "papayaMriDiv2", borderless: true },
                   referenceImage2
-                  /*{
-                    type: "header", template: "Original Labels Viewer",
-                    css: "headerclass"
-                  },
-                  { view: "template", content: "papayaLabelDiv2", borderless: true },*/
-
                 ]
               }
             ]
@@ -2160,7 +2235,6 @@
       papayaContainers[3].preferences.smoothDisplay = 'No';
 
       //--Activate annotation for papaya container 1- default    
-      //-- addMouseMoveHandler(inferenceModelsList[$$("selectModel").getValue() - 1]["labelsPath"], 1);
       addMouseMoveHandler("./models/GT/labels.json", 1);
 
 

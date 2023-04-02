@@ -1130,14 +1130,12 @@
             }
         }
 
-
         let colorsRgbObj = [];
 
         // Array of threshold grey value of each class
         let classGreyValue = [];
 
         if (opts.isColorEnable) {
-
             //Find the threshold grey value of each class
             for (let classIdx = 0; classIdx < numSegClasses; classIdx++) {
                 classGreyValue[classIdx] = Math.ceil(classIdx * 255 / (numSegClasses - 1));
