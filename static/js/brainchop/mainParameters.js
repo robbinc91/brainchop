@@ -21,21 +21,33 @@
 //---------- initialize Globals-------//  
 
 
+var loadedMRI = false;
+var loadedMRI2 = false;
+var loadedLabel = false;
+var loadedLabel2 = false;
+
 //Raw Nifti Data and header
 var rawNiftiData = [];
+var rawNiftiData2 = [];
 //Object    
 var niftiHeader = [];
+var niftiHeader2 = [];
 //ArrayBuffer
 var niftiImage = [];
+var niftiImage2 = [];
 //Object
 var labelNiftiHeader = [];
+var labelNiftiHeader2 = [];
 //ArrayBuffer
 var labelNiftiImage = [];
+var labelNiftiImage2 = [];
 //Flag for futur use
 var gtLabelLoaded = false;
+var gtLabelLoaded2 = false;
 
 // Nifti file to load *.nii
 var refFileName = '';
+var refFileName2 = '';
 
 // When browsing to tfjs model with browse window
 var modelFile;
@@ -46,6 +58,7 @@ var browserModelList = [];
 
 // Number of overlay added to MRI viewer
 var numOfOverlays;
+var numOfOverlays2;
 
 var numOfModelsWithoutBrowse;
 
@@ -99,6 +112,17 @@ var statData = {
      GPU_Card: null, GPU_Card_Full: null, Status: null, CPU_Cores: null, Error_Type: null, Extra_Err_Info: null, Extra_Info: null
 };
 
+var statData2 = {
+     Brainchop_Ver: null, Country: null, State: null, City: null, Date: null, Time: null,
+     File_Name: null, Img_Size: null, Num_Bits_Per_Voxel: null, Data_Type_Code: null, Vox_Offset: null, Vox_1mm: null, Resampled: null, File_Verified: null,
+     Input_Shape: null, Output_Shape: null, Channel_Last: null, Model_Param: Infinity, Model_Layers: Infinity,
+     No_SubVolumes: null, Actual_Labels: Infinity, Expect_Labels: Infinity, NumLabels_Match: null,
+     Data_Load: null, Preprocess_t: null, Inference_t: null, Merge_t: null, Postprocess_t: null,
+     Model: null, Browser: null, Browser_Ver: null, OS: null, Texture_Size: null, Heap_Size_MB: Infinity, Used_Heap_MB: Infinity, Heap_Limit_MB: Infinity,
+     WebGL1: null, WebGL2: null, TF_Backend: null, GPU_Vendor: null, GPU_Vendor_Full: null,
+     GPU_Card: null, GPU_Card_Full: null, Status: null, CPU_Cores: null, Error_Type: null, Extra_Err_Info: null, Extra_Info: null
+};
+
 
 
 // Inference Models, the ids must start from 1 in sequence
@@ -106,10 +130,10 @@ var inferenceModelsList = [
      {
           id: 1,  // Must start from 1
           type: "Segmentation",
-          path: "/static/models/model21_3class/model.json",
+          path: "./models/model21_3class/model.json",
           modelName: "Subvolume GWM (failsafe)",
-          labelsPath: "/static/models/model21_3class/labels.json",
-          colorsPath: "/static/models/model21_3class/colorLUT.json",
+          labelsPath: "./models/model21_3class/labels.json",
+          colorsPath: "./models/model21_3class/colorLUT.json",
           preModelId: null, // Model run first e.g.  crop the brain  {null, 1, 2, ..  }                                                                         
           isBatchOverlapEnable: false, //create extra overlap batches for inference 
           numOverlapBatches: 200, //Number of extra overlap batches for inference  
@@ -126,10 +150,10 @@ var inferenceModelsList = [
      {
           id: 2,
           type: "Segmentation",
-          path: "/static/models/model5_gw_ae/model.json",
+          path: "./models/model5_gw_ae/model.json",
           modelName: "Full Brain GWM (light)",
-          labelsPath: "/static/models/model5_gw_ae/labels.json",
-          colorsPath: "/static/models/model5_gw_ae/colorLUT.json",
+          labelsPath: "./models/model5_gw_ae/labels.json",
+          colorsPath: "./models/model5_gw_ae/colorLUT.json",
           preModelId: null, // Model run first e.g.  crop the brain   { null, 1, 2, ..  }                                                                          
           isBatchOverlapEnable: false, //create extra overlap batches for inference 
           numOverlapBatches: 0, //Number of extra overlap batches for inference  
@@ -146,10 +170,10 @@ var inferenceModelsList = [
      {
           id: 3,
           type: "Segmentation",
-          path: "/static/models/model11_gw_ae/model.json",
+          path: "./models/model11_gw_ae/model.json",
           modelName: "Full Brain GWM (large)",
-          labelsPath: "/static/models/model11_gw_ae/labels.json",
-          colorsPath: "/static/models/model11_gw_ae/colorLUT.json",
+          labelsPath: "./models/model11_gw_ae/labels.json",
+          colorsPath: "./models/model11_gw_ae/colorLUT.json",
           preModelId: null, // Model run first e.g.  crop the brain   { null, 1, 2, ..  }                                                                          
           isBatchOverlapEnable: false, //create extra overlap batches for inference 
           numOverlapBatches: 0, //Number of extra overlap batches for inference 
@@ -166,7 +190,7 @@ var inferenceModelsList = [
      {
           id: 4,
           type: "Brain_Extraction",
-          path: "/static/models/model5_gw_ae/model.json",
+          path: "./models/model5_gw_ae/model.json",
           modelName: "Extract the Brain (FAST)",
           labelsPath: null,
           colorsPath: null,
@@ -186,7 +210,7 @@ var inferenceModelsList = [
      {
           id: 5,
           type: "Brain_Extraction",
-          path: "/static/models/mnm_tfjs_me_test/model.json",
+          path: "./models/mnm_tfjs_me_test/model.json",
           modelName: "Extract the Brain (failsafe)",
           labelsPath: null,
           colorsPath: null,
@@ -205,7 +229,7 @@ var inferenceModelsList = [
      {
           id: 6,
           type: "Brain_Masking",
-          path: "/static/models/model5_gw_ae/model.json",
+          path: "./models/model5_gw_ae/model.json",
           modelName: "Compute Brain Mask (FAST)",
           labelsPath: null,
           colorsPath: null,
@@ -225,7 +249,7 @@ var inferenceModelsList = [
      {
           id: 7,
           type: "Brain_Masking",
-          path: "/static/models/mnm_tfjs_me_test/model.json",
+          path: "./models/mnm_tfjs_me_test/model.json",
           modelName: "Compute Brain Mask (failsafe)",
           labelsPath: null,
           colorsPath: null,
@@ -245,10 +269,10 @@ var inferenceModelsList = [
      {
           id: 8,
           type: "Atlas",
-          path: "/static/models/model11_50class/model.json",
+          path: "./models/model11_50class/model.json",
           modelName: "Cortical Atlas 50",
-          labelsPath: "/static/models/model11_50class/labels.json",
-          colorsPath: "/static/models/model11_50class/colorLUT.json",
+          labelsPath: "./models/model11_50class/labels.json",
+          colorsPath: "./models/model11_50class/colorLUT.json",
           preModelId: 6,// Model run first e.g.  crop the brain  { null, 1, 2, ..  } 
           isBatchOverlapEnable: false, //create extra overlap batches for inference 
           numOverlapBatches: 200, //Number of extra overlap batches for inference  
@@ -264,10 +288,10 @@ var inferenceModelsList = [
      , {
           id: 9,
           type: "Atlas",
-          path: "/static/models/model21_104class/model.json",
+          path: "./models/model21_104class/model.json",
           modelName: "FS aparc+aseg Atlas 104",
-          labelsPath: "/static/models/model21_104class/labels.json",
-          colorsPath: "/static/models/model21_104class/colorLUT.json",
+          labelsPath: "./models/model21_104class/labels.json",
+          colorsPath: "./models/model21_104class/colorLUT.json",
           preModelId: 2,  // model run first e.g.  Brain_Extraction  { null, 1, 2, ..  } 
           isBatchOverlapEnable: false, //create extra overlap batches for inference 
           numOverlapBatches: 200, //Number of extra overlap batches for inference  
@@ -283,10 +307,10 @@ var inferenceModelsList = [
      , {
           id: 10,
           type: "Atlas",
-          path: "/static/models/model21_104class/model_D95.json",
+          path: "./models/model21_104class/model_D95.json",
           modelName: "FS aparc+aseg Atlas 104 (failsafe)",
-          labelsPath: "/static/models/model21_104class/labels.json",
-          colorsPath: "/static/models/model21_104class/colorLUT.json",
+          labelsPath: "./models/model21_104class/labels.json",
+          colorsPath: "./models/model21_104class/colorLUT.json",
           preModelId: 6,  // model run first e.g.  Brain_Extraction { null, 1, 2, ..  } 
           isBatchOverlapEnable: false, //create extra overlap batches for inference 
           numOverlapBatches: 200, //Number of extra overlap batches for inference  
@@ -305,6 +329,7 @@ var inferenceModelsList = [
 
 //--For use with three.js
 var outVolumeStatus = { out3DArr: null, totalVolume: 0, labelsHistoObj: null, colorLutObj: null, labelsObj: null };
+var outVolumeStatus2 = { out3DArr: null, totalVolume: 0, labelsHistoObj: null, colorLutObj: null, labelsObj: null };
 
 //Heatmap colors, for reproduce:  https://www.w3schools.com/colors/colors_hsl.asp
 var manualColorsRange = [/*Red*/ "hsla(0,100%,50%)", /*Vermillion*/ "hsla(30,100%,50%)", /*Orange*/ "hsla(60,100%,50%)",
@@ -333,6 +358,13 @@ params_mri["expandable"] = true;
 params_mri["kioskMode"] = false;
 params_mri["noNewFiles"] = true;
 
+var params_mri2 = [];
+params_mri2["worldSpace"] = false;
+params_mri2["expandable"] = true;
+// To hide the toolbar
+params_mri2["kioskMode"] = false;
+params_mri2["noNewFiles"] = true;
+
 papaya.Container.syncViewers = true;
 
 // Labels Viewer settings
@@ -343,6 +375,14 @@ params_label["expandable"] = true;
 params_label["kioskMode"] = false;
 params_label["noNewFiles"] = true;
 params_label["smoothDisplay"] = false;
+
+var params_label2 = [];
+params_label2["worldSpace"] = false;
+params_label2["expandable"] = true;
+// To hide the toolbar
+params_label2["kioskMode"] = false;
+params_label2["noNewFiles"] = true;
+params_label2["smoothDisplay"] = false;
 
 
 

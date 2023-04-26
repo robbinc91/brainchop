@@ -63,15 +63,9 @@
   color: white;
 }
 
-#annotOfContainer_0 {
-  /*font-weight: bold;*/
-  background-color: black;
-  color: white;
-  text-align: center;
-  height: 3vh;
-}
-
-#annotOfContainer_1 {
+#annotOfContainer_0,
+#annotOfContainer_1,
+#annotOfContainer_2 {
   /*font-weight: bold;*/
   background-color: black;
   color: white;

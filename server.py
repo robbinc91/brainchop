@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def server():
-    return 'Hello, World!'
+    return index()
 
 
 @app.route('/brainchop')
