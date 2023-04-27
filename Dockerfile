@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM tensorflow/tensorflow:2.5.0-gpu
+FROM python:3.9.16-alpine3.17
 
 WORKDIR /brainchop
 

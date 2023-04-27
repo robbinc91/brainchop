@@ -2,6 +2,7 @@ Flask>=2.2.2
 antspyx
 pyrobex
 fslpy
+tensorflow==2.5.0
 h5py==2.9.0
 keras==2.4.3
 scipy==1.7.3
