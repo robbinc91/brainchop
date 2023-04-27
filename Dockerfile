@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.9.16-alpine3.17
+FROM python:3.9.12
 
 WORKDIR /brainchop
 
@@ -14,6 +14,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 	pip install --upgrade --pre SimpleITK --find-links https://github.com/SimpleITK/SimpleITK/releases/tag/latest
 
 COPY . .
+
+#RUN cd py && \
+#	pip install antspyx-0.3.8.tar.gz && \
+#	pip install pyrobex-0.4.3-py2.py3-none-any.whl && \
+#	cd ..
 
 ENV FLASK_APP=server.py
 

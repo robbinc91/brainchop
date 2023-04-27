@@ -3,3 +3,4 @@ __pycache__
 .github/workflows/draft-pdf.yml
 **/models
 temp
+py
