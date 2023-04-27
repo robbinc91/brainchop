@@ -1547,711 +1547,659 @@
 
       // To load models dynamically from  inferenceModelsList
       let selectModelOptions = getSegmentationFormOptions(inferenceModelsList);
+      console.log(selectModelOptions);
+      let modelOptions = {{ available_models|tojson  }};
+      modelOptions.push({ id: "Browse...", value: "Browse...", path: null });
+      console.log(modelOptions);
 
-      //-- Count total number of models excluding browsing models
-      numOfModelsWithoutBrowse = inferenceModelsList.length;
+    //-- Count total number of models excluding browsing models
+    numOfModelsWithoutBrowse = inferenceModelsList.length;
 
 
-      onShowWarningCheck = (checkElem) => {
-        webix.storage.local.put("noShowWarning", document.getElementById("noShowWarningId").checked);
+    onShowWarningCheck = (checkElem) => {
+      webix.storage.local.put("noShowWarning", document.getElementById("noShowWarningId").checked);
+    }
+
+    fetchModelWarningStatus = () => {
+      return webix.storage.local.get("noShowWarning");
+    }
+
+    onShowTooltipCheck = (checkElem) => {
+      webix.storage.local.put("noShowTooltip", document.getElementById("noShowTooltipId").checked);
+
+    }
+
+    fetchModelTooltipStatus = () => {
+      return webix.storage.local.get("noShowTooltip");
+    }
+
+    getModelinfo = () => {
+      let modelDescription = modelOptions[$$("selectModel").getValue()]["description"];
+      let info = "No info for this model";
+
+      if (modelDescription) {
+        info = modelDescription;
       }
 
-      fetchModelWarningStatus = () => {
-        return webix.storage.local.get("noShowWarning");
-      }
-
-      onShowTooltipCheck = (checkElem) => {
-        webix.storage.local.put("noShowTooltip", document.getElementById("noShowTooltipId").checked);
-
-      }
-
-      fetchModelTooltipStatus = () => {
-        return webix.storage.local.get("noShowTooltip");
-      }
-
-      getModelinfo = () => {
-        let modelDescription = inferenceModelsList[$$("selectModel").getValue() - 1]["description"];
-        let info = "No info for this model";
-
-        if (modelDescription) {
-          info = modelDescription;
-        }
-
-        $$("modelTooltip").show();
-        document.getElementById("tooltipDiv").innerHTML =
-          "<i style='font-size:1.4vw'  class='fa fa-info-circle' ></i> <font style='font-size:0.77vw' >&nbsp&nbsp" + info + " </font>"
-      }
-
-      getOutputInfo = () => {
-
-        
-        let info = '<p>Icon <img src="' + chart_icon_url + '" style="opacity:0.3;filter:alpha(opacity=30);width:15px;height:15px;"/> allows to see the histogram of labels occurring in the segmentation.</p><p>Icon <img src="' + view3d_icon_url + '" style="opacity:0.3;filter:alpha(opacity=30);width:15px;height:15px;"/> allows to show a 3D view of the segmented labels.</p>';
-        $$("modelTooltip").show();
-        document.getElementById("tooltipDiv").innerHTML =
-          "<i style='font-size:1.4vw'  class='fa fa-info-circle' ></i> <font style='font-size:0.77vw' >&nbsp&nbsp" + info + " </font>"
-      }
-
-      resestDependency = () => {
-        //-- For future use
-        document.getElementById("out3D-1").style.opacity = 0.3;
-        document.getElementById("outChart-1").style.opacity = 0.3;
-        document.getElementById("out3D-1").style.filter = "alpha(opacity=30)";
-        document.getElementById("outChart-1").style.filter = "alpha(opacity=30)";
-        //-- Reset papaya MRI viewer overlay if exists
-        resetMriViewerOverlay(1);
-        //-- Reset Label Viewer        
-        resetLabelViewer();
-        clearOutputThreejsWin();
-        resetMainParameters();
-      }
-
-      disableControls = () => {
-        $$("out3DIcon").disable();
-        $$("outChartIcon").disable();
-        $$("downloadBtn").disable();
-        $$("segmentBtn").disable();
-      }
-
-      newRunInferencePrepare = () => {
-        var defer = $.Deferred();
-        disableControls();
-        resestDependency();
-
-        setTimeout(function () {
-          defer.resolve(); // When this fires, the code in a().then(/..../); is executed.
-        }, 100);
-
-        return defer;
-      }
-
-      let Segmentation = {
-        view: "form", id: "Segmentation", elements: [
-          {
-            type: "header", template: "Segmentation Options",
-            css: "headerclass"
-          },
-
-          {
-            cols: [
-
-              {
-                view: "select",
-                label: "Models",
-                id: "selectModel",
-                value: 2,
-                options: selectModelOptions,
-                on: {
-                  onChange: function (newValue, oldValue, config) {
-                    const selectedModelEntry = selectModelOptions[this.getValue() - 1];
-
-                    if (newValue == "Browse...") {
-                      console.log("Browse selected ..")
-                      $$("modelBrowsingWindow").show();
-
-                    } else if (selectedModelEntry["path"]) {
-                      modelObject = {};
-                      const modelEntry = selectModelOptions[this.getValue() - 1];
-
-                      let curModelEntry = inferenceModelsList.filter(entry => entry.id == this.getValue().toString())[0];
-
-                      let noShowWarningStatus = fetchModelWarningStatus();
-
-                      if (!noShowWarningStatus) {
-
-                        if (curModelEntry["warning"] != null) {
-                          $$("modelTooltip").show();
-                          document.getElementById("tooltipDiv").innerHTML =
-                            "<i style='font-size:1.4vw'  class='fa fa-info-circle' ></i> <font style='font-size:0.9vw' >&nbsp&nbsp" + curModelEntry["warning"] + " </font><br><br><input type='checkbox' id='noShowWarningId' onclick='onShowWarningCheck(this)' name='noShowWarning'><label for='noShowWarning'> Don't show </label>"
-
-                        }
-                      }
-
-
-                      let noShowTooltipStatus = fetchModelTooltipStatus();
-
-                      if (!noShowTooltipStatus) {
-
-                        if (curModelEntry["textureSize"] != 0) {
-                          //--Compare model needed texture size and browser max texture size 
-                          if (curModelEntry["textureSize"] > getMaxTextureSize()) {
-                            $$("modelTooltip").show();
-
-                            let warningMessage = "Current browser may not able to run selected model. " + curModelEntry["warning"];
-                            // $$("modelTooltip").config.body.template = 
-                            document.getElementById("tooltipDiv").innerHTML =
-                              "<i style='font-size:1.4vw'  class='fa fa-info-circle' ></i> <font style='font-size:0.77vw' >&nbsp&nbsp" + warningMessage + " </font><br><br><input type='checkbox' id='noShowTooltipId'  name='noShowTooltip' onclick='onShowTooltipCheck(this)'><label for='noShowTooltip'> Don't show </label>"
-                          }
-                        }
-                      }
-
-
-                    } else {
-                      let modelEntry = browserModelList.filter(entry => entry.id == this.getValue().toString())[0];
-                      if (!(modelEntry.modelFile && modelEntry.weightFile)) {
-
-                        $$("segmentBtn").disable();
-                      }
-
-                    }
-
-                  },
-                  onAfterRender: function () {
-                    const modelEntry = selectModelOptions[this.getValue() - 1];
-
-                    if (!modelEntry["path"]) {
-
-                      let modelEntry = browserModelList.filter(entry => entry.id == this.getValue().toString())[0];
-                      if (!(modelEntry.modelFile && modelEntry.weightFile)) {
-
-                        $$("segmentBtn").disable();
-                      }
-                    }
-
-                  }
-                }
-              },
-
-
-              {
-                view: "label",
-                label: '<img src="css/svg/info-circle-solid.svg"/>',
-                css: { "color": "black !important", "font-weight": "bold", "cursor": "pointer" },
-                width: 25,
-                height: 25,
-                click: function () {
-                  getModelinfo();
-                }
-              }
-
-            ]
-          },
-
-          {
-            cols: [
-              {
-                view: "label", label: "Inference",
-                id: "segmentBtnLabel",
-                align: "left"
-              },
-              {
-                view: "button", label: "Run",
-                css: "bt_1",
-                disabled: true,
-                id: "segmentBtn",
-                align: "left",
-                click: function () {
-
-                  // test for requirement 
-                  let maxTextureAvail = getMaxTextureSize();
-                  let requiredTexture = inferenceModelsList[$$("selectModel").getValue() - 1]["textureSize"];
-                  if (maxTextureAvail >= requiredTexture) {
-
-                    newRunInferencePrepare().then(res => { runInference(); })
-
-                  } else {
-                    webix.alert("This model needs texture size of minimum " + requiredTexture + ", while current browser supports only " + maxTextureAvail);
-                  }
-                }
-              }
-            ]
-          },
-          { content: "progressBarDiv", height: 50 }
-          // { content: "subProgressBarDiv" , height:50},
-
-        ]
-      }
-
-
-      //--------------------------------------------//
-      //---------- Output Rendering ----------------//
-      //--------------------------------------------//
-
-      showThreejsWindow = () => {
-        var defer = $.Deferred();
-        $$("outputThreejsWinId").show();
-
-        if (!outputSceneRendered) { // if false,  render 
-          document.getElementById("loadingIconDiv").style.display = "";
-        } else {
-          document.getElementById("loadingIconDiv").style.display = "none";
-        }
-
-        setTimeout(function () {
-          defer.resolve(); // When this fires, the code in a().then(/..../); is executed.
-        }, 100);
-
-        return defer;
-      }
-
-      let outputOptions = {
-        view: "form", id: "OutputOptionsId", elements: [
-          {
-            cols: [
-              {
-                view: "label", label: "Output Volumes",
-                id: "outChartLabel",
-                align: "left"
-              },
-
-
-
-            ]
-          },
-
-          {
-            cols: [
-              {
-                view: "label", label: "Output 3D",
-                id: "out3DLabel",
-                align: "left"
-              },
-
-
-            ]
-          }
-        ]
-      }
-
-      // Welcome Window
-      let welcomeWindowForm = {
-        view: "form", id: "welcomeWindowFormId", elements: [
-
-          {
-            cols: [
-              {
-                view: "template", template: " <img src='css/svg/Artboard2.svg'  width='20%' align='right'>" +
-                  " <p align='justify'> Welcome to brainchop, a" + " frontend" + " tool for  volumetric segmentation of neuroimaging that works locally on the user side.</p>" +
-                  " <p align='justify'> You're viewing a sample T1 (Left)  and its tissue segmentation (Right). Brainchop currenlty supports MRI Nifti file format. </p>" +
-                  "<p align='justify'> To see the tool in action please select a model from the list and run the inference. For more information on brainchop please refer to this <a href='https://github.com/neuroneural/brainchop/wiki/' target='_blank'><b> Wiki </b></a> and this <a href='https://trendscenter.org/in-browser-3d-mri-segmentation-brainchop-org/' target='_blank'><b> Blog</b></a>. For questions or sharing ideas please refere to our  <b><a href='https://github.com/neuroneural/brainchop/discussions/'  target='_blank'> Discussions </a></b> board. </p>" +
-                  " <center> <video id='advVideo' autoplay muted width='400' controls poster='css/images/BrainchopBanner.png'>  <source src='css/media/brainchopV1_3.mp4' type='video/mp4'>Your browser does not support the video tag</video> </center> <br>" +
-                  "<input type='checkbox' id='noShowWelcomeWindow'  name='noShowWelcomeWindow'><label for='noShowWelcomeWindow'><font color='black'>  Don't show again </font></label>",
-
-                on: {
-                  onAfterRender: function () {
-                    if (fetchWelcomeScreenStatus() == null || fetchWelcomeScreenStatus()) {
-                      // document.getElementById('advVideo').muted = false; 
-                    }
-
-                  }
-                }
-
-              }
-
-            ]
-
-          },
-
-
-          {
-            cols: [
-              {},
-
-              {
-                view: "button", value: "Ok", css: "bt_1", width: 100,
-                align: "center",
-                click: function () {
-                  $$("welcomeWindow").hide();
-                  document.getElementById('advVideo').pause();
-                  webix.storage.local.put("showWelcomeScreen", !document.getElementById("noShowWelcomeWindow").checked);
-                }
-              },
-
-              {}
-            ]
-          }
-
-        ]
-
-      }
-
-
-      webix.ui({
-        view: "popup",
-        id: "modelTooltip",
-        // head:"<i style='font-size:1.8vw'  class='fa fa-info-circle' ></i>",
-        body: {
-          template: "<div id='tooltipDiv'></div>"
+      $$("modelTooltip").show();
+      document.getElementById("tooltipDiv").innerHTML =
+        "<i style='font-size:1.4vw'  class='fa fa-info-circle' ></i> <font style='font-size:0.77vw' >&nbsp&nbsp" + info + " </font>"
+    }
+
+    getOutputInfo = () => {
+
+
+      let info = '<p>Icon <img src="' + chart_icon_url + '" style="opacity:0.3;filter:alpha(opacity=30);width:15px;height:15px;"/> allows to see the histogram of labels occurring in the segmentation.</p><p>Icon <img src="' + view3d_icon_url + '" style="opacity:0.3;filter:alpha(opacity=30);width:15px;height:15px;"/> allows to show a 3D view of the segmented labels.</p>';
+      $$("modelTooltip").show();
+      document.getElementById("tooltipDiv").innerHTML =
+        "<i style='font-size:1.4vw'  class='fa fa-info-circle' ></i> <font style='font-size:0.77vw' >&nbsp&nbsp" + info + " </font>"
+    }
+
+    resestDependency = () => {
+      //-- For future use
+      document.getElementById("out3D-1").style.opacity = 0.3;
+      document.getElementById("outChart-1").style.opacity = 0.3;
+      document.getElementById("out3D-1").style.filter = "alpha(opacity=30)";
+      document.getElementById("outChart-1").style.filter = "alpha(opacity=30)";
+      //-- Reset papaya MRI viewer overlay if exists
+      resetMriViewerOverlay(1);
+      //-- Reset Label Viewer        
+      resetLabelViewer();
+      clearOutputThreejsWin();
+      resetMainParameters();
+    }
+
+    disableControls = () => {
+      $$("out3DIcon").disable();
+      $$("outChartIcon").disable();
+      $$("downloadBtn").disable();
+      $$("segmentBtn").disable();
+    }
+
+    newRunInferencePrepare = () => {
+      var defer = $.Deferred();
+      disableControls();
+      resestDependency();
+
+      setTimeout(function () {
+        defer.resolve(); // When this fires, the code in a().then(/..../); is executed.
+      }, 100);
+
+      return defer;
+    }
+
+    let info_circle_solid_url = "{{ url_for('static', filename='css/svg/info-circle-solid.svg')}}";
+
+    let Segmentation = {
+      view: "form", id: "Segmentation", elements: [
+        {
+          type: "header", template: "Segmentation Options",
+          css: "headerclass"
         },
-        position: function (state) {
-          state.width = state.maxWidth * 20 / 100;
-          state.height = state.maxHeight * 15 / 100;
-          state.left = (state.maxWidth - state.width) / 1.01;
-          state.top = (state.maxHeight - state.height) / 1.1;
-        }
 
-      });
+        {
+          cols: [
 
-
-      // Welcome Window to select local model
-      webix.ui({
-        view: "window",
-        id: "welcomeWindow",
-        height: 620,
-        width: 600,
-        head: {
-          view: "toolbar", css: "toolbarclass", elements: [
-            { type: "header", template: "Welcome", css: "windowtitleclass" },
             {
-              view: "icon", icon: "wxi-close", click: function () {
+              view: "select",
+              label: "Models",
+              id: "selectModel",
+              value: 0,
+              options: modelOptions,
+              on: {
+                onChange: function (newValue, oldValue, config) {
+                  if (newValue == "Browse...") {
+                    console.log("Browse selected ..")
+                    $$("modelBrowsingWindow").show();
+                  }
+                },
+                onAfterRender: function () {
+
+                }
+              }
+            },
+
+
+            {
+              view: "label",
+              label: '<img src="' + info_circle_solid_url + '"/>',
+              css: { "color": "black !important", "font-weight": "bold", "cursor": "pointer" },
+              width: 25,
+              height: 25,
+              click: function () {
+                getModelinfo();
+              }
+            }
+
+          ]
+        },
+
+        {
+          cols: [
+            {
+              view: "label", label: "Inference",
+              id: "segmentBtnLabel",
+              align: "left"
+            },
+            {
+              view: "button", label: "Run",
+              css: "bt_1",
+              disabled: true,
+              id: "segmentBtn",
+              align: "left",
+              click: function () {
+
+                // test for requirement 
+                let maxTextureAvail = getMaxTextureSize();
+                let requiredTexture = inferenceModelsList[$$("selectModel").getValue() - 1]["textureSize"];
+                if (maxTextureAvail >= requiredTexture) {
+
+                  newRunInferencePrepare().then(res => { runInference(); })
+
+                } else {
+                  webix.alert("This model needs texture size of minimum " + requiredTexture + ", while current browser supports only " + maxTextureAvail);
+                }
+              }
+            }
+          ]
+        },
+        { content: "progressBarDiv", height: 50 }
+        // { content: "subProgressBarDiv" , height:50},
+
+      ]
+    }
+
+
+    //--------------------------------------------//
+    //---------- Output Rendering ----------------//
+    //--------------------------------------------//
+
+    showThreejsWindow = () => {
+      var defer = $.Deferred();
+      $$("outputThreejsWinId").show();
+
+      if (!outputSceneRendered) { // if false,  render 
+        document.getElementById("loadingIconDiv").style.display = "";
+      } else {
+        document.getElementById("loadingIconDiv").style.display = "none";
+      }
+
+      setTimeout(function () {
+        defer.resolve(); // When this fires, the code in a().then(/..../); is executed.
+      }, 100);
+
+      return defer;
+    }
+
+    let outputOptions = {
+      view: "form", id: "OutputOptionsId", elements: [
+        {
+          cols: [
+            {
+              view: "label", label: "Output Volumes",
+              id: "outChartLabel",
+              align: "left"
+            },
+
+
+
+          ]
+        },
+
+        {
+          cols: [
+            {
+              view: "label", label: "Output 3D",
+              id: "out3DLabel",
+              align: "left"
+            },
+
+
+          ]
+        }
+      ]
+    }
+
+    // Welcome Window
+    let welcomeWindowForm = {
+      view: "form", id: "welcomeWindowFormId", elements: [
+
+        {
+          cols: [
+            {
+              view: "template", template: " <img src='css/svg/Artboard2.svg'  width='20%' align='right'>" +
+                " <p align='justify'> Welcome to brainchop, a" + " frontend" + " tool for  volumetric segmentation of neuroimaging that works locally on the user side.</p>" +
+                " <p align='justify'> You're viewing a sample T1 (Left)  and its tissue segmentation (Right). Brainchop currenlty supports MRI Nifti file format. </p>" +
+                "<p align='justify'> To see the tool in action please select a model from the list and run the inference. For more information on brainchop please refer to this <a href='https://github.com/neuroneural/brainchop/wiki/' target='_blank'><b> Wiki </b></a> and this <a href='https://trendscenter.org/in-browser-3d-mri-segmentation-brainchop-org/' target='_blank'><b> Blog</b></a>. For questions or sharing ideas please refere to our  <b><a href='https://github.com/neuroneural/brainchop/discussions/'  target='_blank'> Discussions </a></b> board. </p>" +
+                " <center> <video id='advVideo' autoplay muted width='400' controls poster='css/images/BrainchopBanner.png'>  <source src='css/media/brainchopV1_3.mp4' type='video/mp4'>Your browser does not support the video tag</video> </center> <br>" +
+                "<input type='checkbox' id='noShowWelcomeWindow'  name='noShowWelcomeWindow'><label for='noShowWelcomeWindow'><font color='black'>  Don't show again </font></label>",
+
+              on: {
+                onAfterRender: function () {
+                  if (fetchWelcomeScreenStatus() == null || fetchWelcomeScreenStatus()) {
+                    // document.getElementById('advVideo').muted = false; 
+                  }
+
+                }
+              }
+
+            }
+
+          ]
+
+        },
+
+
+        {
+          cols: [
+            {},
+
+            {
+              view: "button", value: "Ok", css: "bt_1", width: 100,
+              align: "center",
+              click: function () {
                 $$("welcomeWindow").hide();
                 document.getElementById('advVideo').pause();
+                webix.storage.local.put("showWelcomeScreen", !document.getElementById("noShowWelcomeWindow").checked);
+              }
+            },
+
+            {}
+          ]
+        }
+
+      ]
+
+    }
+
+
+    webix.ui({
+      view: "popup",
+      id: "modelTooltip",
+      // head:"<i style='font-size:1.8vw'  class='fa fa-info-circle' ></i>",
+      body: {
+        template: "<div id='tooltipDiv'></div>"
+      },
+      position: function (state) {
+        state.width = state.maxWidth * 20 / 100;
+        state.height = state.maxHeight * 15 / 100;
+        state.left = (state.maxWidth - state.width) / 1.01;
+        state.top = (state.maxHeight - state.height) / 1.1;
+      }
+
+    });
+
+
+    // Welcome Window to select local model
+    webix.ui({
+      view: "window",
+      id: "welcomeWindow",
+      height: 620,
+      width: 600,
+      head: {
+        view: "toolbar", css: "toolbarclass", elements: [
+          { type: "header", template: "Welcome", css: "windowtitleclass" },
+          {
+            view: "icon", icon: "wxi-close", click: function () {
+              $$("welcomeWindow").hide();
+              document.getElementById('advVideo').pause();
+            }
+          }
+        ]
+      },
+
+      position: "center",
+      body: welcomeWindowForm
+    })
+
+
+    fetchWelcomeScreenStatus = () => {
+      return webix.storage.local.get("showWelcomeScreen");
+    }
+
+    if (fetchWelcomeScreenStatus() == null || fetchWelcomeScreenStatus()) {
+      $$("welcomeWindow").show();
+    } else {
+      $$("welcomeWindow").hide();
+    }
+
+
+
+
+    let downloadNiftiFile = {
+      view: "form", id: "downloadNiftiFileId", elements: [
+        {
+          type: "header", template: "Save Labels",
+          css: "headerclass"
+        },
+
+        {
+          cols: [
+            {
+              view: "label", label: "File Name",
+              align: "left"
+            },
+            {
+              view: "text",
+              value: "labels.nii",
+              id: "fileNameToDL",
+              disabled: false,
+              align: "left",
+              on: {
+                onChange: function (newValue, oldValue, config) {
+                  if (newValue.length && allOutputSlices3DCC1DimArray.length && isLetter(newValue[0])) {
+                    $$("downloadBtn").enable();
+                  } else {
+                    $$("downloadBtn").disable();
+                  }
+
+                }
               }
             }
           ]
         },
 
-        position: "center",
-        body: welcomeWindowForm
-      })
-
-
-      fetchWelcomeScreenStatus = () => {
-        return webix.storage.local.get("showWelcomeScreen");
-      }
-
-      if (fetchWelcomeScreenStatus() == null || fetchWelcomeScreenStatus()) {
-        $$("welcomeWindow").show();
-      } else {
-        $$("welcomeWindow").hide();
-      }
-
-
-
-
-      let downloadNiftiFile = {
-        view: "form", id: "downloadNiftiFileId", elements: [
-          {
-            type: "header", template: "Save Labels",
-            css: "headerclass"
-          },
-
-          {
-            cols: [
-              {
-                view: "label", label: "File Name",
-                align: "left"
-              },
-              {
-                view: "text",
-                value: "labels.nii",
-                id: "fileNameToDL",
-                disabled: false,
-                align: "left",
-                on: {
-                  onChange: function (newValue, oldValue, config) {
-                    if (newValue.length && allOutputSlices3DCC1DimArray.length && isLetter(newValue[0])) {
-                      $$("downloadBtn").enable();
-                    } else {
-                      $$("downloadBtn").disable();
-                    }
-
-                  }
-                }
-              }
-            ]
-          },
-
-          {
-            cols: [
-              {
-                view: "label", label: "Labels",
-                align: "left"
-              },
-              {
-                view: "button", label: "Save",
-                id: "downloadBtn",
-                css: "bt_1",
-                disabled: true,
-                align: "left",
-                click: function () {
-
-                  if (allOutputSlices3DCC1DimArray.length) {
-                    let downloadFileName = $$("fileNameToDL").getValue();
-
-                    if (downloadFileName.search(".nii") < 0) {
-                      // if nii extension doesn't exist, then search will return -1
-                      downloadFileName = downloadFileName + ".nii";
-                    }
-
-                    downloadNifti(allOutputSlices3DCC1DimArray, rawNiftiData, downloadFileName);
-
-                  } else {
-                    webix.message("No download Data");
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-
-
-      let memoryView = {
-        view: "chart",
-        type: "barH",
-        id: "memoryMonitor",
-        width: 120,
-        height: 10,
-        value: "#memoryUse#",
-        gradient: function (gradient) {
-          gradient.addColorStop(1.0, "#FF0000");
-          gradient.addColorStop(0.5, "#FFFF00");
-          gradient.addColorStop(0.0, "#00FF22");
-        },
-        alpha: 0.8,
-        radius: 2,
-        border: false,
-        xAxis: {
-          start: 0,
-          end: 100,
-          step: 10,
-          template: ""
-        },
-        yAxis: {
-          template: ""
-        }
-      }
-
-
-      let hardwareStatus = {
-        view: "form", id: "hardwareStatusId", elements: [
-          {
-            type: "header", template: "Status",
-            css: "headerclass"
-          },
-
-          {
-            cols: [
-              {
-                view: "label", label: "WebGL-2", width: 70,
-                align: "left"
-              },
-              {
-                view: "label", label: "<span id='webGl2Status' style='background-color:none; padding-left:0.5vw;'>&nbsp&nbsp</span>", align: "left"
-              },
-
-              {
-                view: "label", label: "Memory", width: 80,
-                align: "right"
-              },  // memoryView              
-              {
-                view: "label", label: "<span id='memoryStatus' style='background-color:none; padding-left:0.5vw;'>&nbsp&nbsp</span>", align: "right"
-              }
-            ]
-          }
-        ]
-      }
-
-
-
-
-      roiHChart = {
-        type: "space", rows: [
-
-          {
-            id: "hchart", view: "highchart",
-            modules: ["series-label", "exporting", "export-data", "accessibility"],
-            settings: {
-              chart: {
-                type: 'column',
-                width: 800,
-                // height: 400,
-                // marginLeft: 0,
-                // marginRight: 0,
-                scrollablePlotArea: {
-                  minWidth: 900,
-                  scrollPositionX: 1
-                }
-              },
-
-              title: {
-                text: ''
-              },
-              subtitle: {
-                text: ''
-              },
-              credits: {
-                enabled: false
-              },
-              plotOptions: {
-                series: {
-                  borderWidth: 1,
-                  borderColor: 'black',
-                  maxPointWidth: 20
-                },
-                bar: {
-                  dataLabels: {
-                    enabled: true
-                  }
-                }
-              },
-              xAxis: {
-                type: 'category',
-
-                categories: null,
-                labels: {
-                  rotation: -45,
-                  step: 1,
-                  style: {
-                    fontSize: '10px',
-                    fontFamily: 'Verdana, sans-serif'
-                  }
-                }
-              },
-
-              yAxis: {
-                min: 0,
-                // max: 100,
-                title: {
-                  text: "Histogram Probability"
-                  // align: 'high'
-                }
-              },
-
-              legend: {
-                enabled: false
-              },
-
-              series: [{
-                name: 'volumes',
-                data: null,
-
-              }]
-            }
-          }
-        ]
-      };
-
-      // Output labels histogram  form
-      let histogramWindowForm = {
-        view: "form", id: "histogramWindowFormId",
-        elements: [
-          roiHChart,
-
-          {
-            cols: [
-              {},
-
-              {
-                view: "button", value: "Ok", css: "bt_1", width: 100,
-                align: "center",
-                click: function () {
-                  //debugger;
-                  $$("labelsHistogramWinId").hide();
-                }
-              },
-              {
-                view: "button", value: "Save Data", css: "bt_1", width: 100,
-                align: "center",
-                click: function () {
-
-                  let labelsHistoObj = outVolumeStatus['labelsHistoObj'];
-                  let fileName = refFileName == "" ? opts.uiSampleName : refFileName;
-                  downloadJsonObj(labelsHistoObj, fileName + "_Seg" + Object.keys(labelsHistoObj).length + "_volumes.json");
-
-                }
-              },
-
-              {}
-            ]
-          }
-
-        ]
-      }
-
-      // Output labels histogram Window 
-      webix.ui({
-        view: "window",
-        id: "labelsHistogramWinId",
-        height: 600,
-        width: 800,
-        move: true,
-        resize: true,
-        head: {
-          view: "toolbar", css: "toolbarclass", elements: [
-            { type: "header", template: "Output Labels", css: "windowtitleclass" },
+        {
+          cols: [
             {
-              view: "icon", icon: "wxi-close", click: function () {
+              view: "label", label: "Labels",
+              align: "left"
+            },
+            {
+              view: "button", label: "Save",
+              id: "downloadBtn",
+              css: "bt_1",
+              disabled: true,
+              align: "left",
+              click: function () {
+
+                if (allOutputSlices3DCC1DimArray.length) {
+                  let downloadFileName = $$("fileNameToDL").getValue();
+
+                  if (downloadFileName.search(".nii") < 0) {
+                    // if nii extension doesn't exist, then search will return -1
+                    downloadFileName = downloadFileName + ".nii";
+                  }
+
+                  downloadNifti(allOutputSlices3DCC1DimArray, rawNiftiData, downloadFileName);
+
+                } else {
+                  webix.message("No download Data");
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+
+
+    let memoryView = {
+      view: "chart",
+      type: "barH",
+      id: "memoryMonitor",
+      width: 120,
+      height: 10,
+      value: "#memoryUse#",
+      gradient: function (gradient) {
+        gradient.addColorStop(1.0, "#FF0000");
+        gradient.addColorStop(0.5, "#FFFF00");
+        gradient.addColorStop(0.0, "#00FF22");
+      },
+      alpha: 0.8,
+      radius: 2,
+      border: false,
+      xAxis: {
+        start: 0,
+        end: 100,
+        step: 10,
+        template: ""
+      },
+      yAxis: {
+        template: ""
+      }
+    }
+
+
+    let hardwareStatus = {
+      view: "form", id: "hardwareStatusId", elements: [
+        {
+          type: "header", template: "Status",
+          css: "headerclass"
+        },
+
+        {
+          cols: [
+            {
+              view: "label", label: "WebGL-2", width: 70,
+              align: "left"
+            },
+            {
+              view: "label", label: "<span id='webGl2Status' style='background-color:none; padding-left:0.5vw;'>&nbsp&nbsp</span>", align: "left"
+            },
+
+            {
+              view: "label", label: "Memory", width: 80,
+              align: "right"
+            },  // memoryView              
+            {
+              view: "label", label: "<span id='memoryStatus' style='background-color:none; padding-left:0.5vw;'>&nbsp&nbsp</span>", align: "right"
+            }
+          ]
+        }
+      ]
+    }
+
+
+
+
+    roiHChart = {
+      type: "space", rows: [
+
+        {
+          id: "hchart", view: "highchart",
+          modules: ["series-label", "exporting", "export-data", "accessibility"],
+          settings: {
+            chart: {
+              type: 'column',
+              width: 800,
+              // height: 400,
+              // marginLeft: 0,
+              // marginRight: 0,
+              scrollablePlotArea: {
+                minWidth: 900,
+                scrollPositionX: 1
+              }
+            },
+
+            title: {
+              text: ''
+            },
+            subtitle: {
+              text: ''
+            },
+            credits: {
+              enabled: false
+            },
+            plotOptions: {
+              series: {
+                borderWidth: 1,
+                borderColor: 'black',
+                maxPointWidth: 20
+              },
+              bar: {
+                dataLabels: {
+                  enabled: true
+                }
+              }
+            },
+            xAxis: {
+              type: 'category',
+
+              categories: null,
+              labels: {
+                rotation: -45,
+                step: 1,
+                style: {
+                  fontSize: '10px',
+                  fontFamily: 'Verdana, sans-serif'
+                }
+              }
+            },
+
+            yAxis: {
+              min: 0,
+              // max: 100,
+              title: {
+                text: "Histogram Probability"
+                // align: 'high'
+              }
+            },
+
+            legend: {
+              enabled: false
+            },
+
+            series: [{
+              name: 'volumes',
+              data: null,
+
+            }]
+          }
+        }
+      ]
+    };
+
+    // Output labels histogram  form
+    let histogramWindowForm = {
+      view: "form", id: "histogramWindowFormId",
+      elements: [
+        roiHChart,
+
+        {
+          cols: [
+            {},
+
+            {
+              view: "button", value: "Ok", css: "bt_1", width: 100,
+              align: "center",
+              click: function () {
+                //debugger;
                 $$("labelsHistogramWinId").hide();
               }
+            },
+            {
+              view: "button", value: "Save Data", css: "bt_1", width: 100,
+              align: "center",
+              click: function () {
+
+                let labelsHistoObj = outVolumeStatus['labelsHistoObj'];
+                let fileName = refFileName == "" ? opts.uiSampleName : refFileName;
+                downloadJsonObj(labelsHistoObj, fileName + "_Seg" + Object.keys(labelsHistoObj).length + "_volumes.json");
+
+              }
+            },
+
+            {}
+          ]
+        }
+
+      ]
+    }
+
+    // Output labels histogram Window 
+    webix.ui({
+      view: "window",
+      id: "labelsHistogramWinId",
+      height: 600,
+      width: 800,
+      move: true,
+      resize: true,
+      head: {
+        view: "toolbar", css: "toolbarclass", elements: [
+          { type: "header", template: "Output Labels", css: "windowtitleclass" },
+          {
+            view: "icon", icon: "wxi-close", click: function () {
+              $$("labelsHistogramWinId").hide();
+            }
+          }
+        ]
+      },
+
+      position: "center",
+      body: histogramWindowForm
+
+    })
+
+    //-------------------------------------------------------//
+    //-------------------------Main--------------------------//
+    //-------------------------------------------------------// 
+
+    webix.ui({
+      margin: 5,
+      rows: [
+        //toolbar,
+        {
+          margin: 20,
+          padding: 20,
+          cols: [
+            {
+              width: 250, margin: 10, rows: [
+                //referenceImage,
+                //referenceImage2,
+                //inputOptions,
+                Segmentation,
+                //outputOptions,
+                downloadNiftiFile,
+                hardwareStatus,
+                {}
+              ]
+            },
+            {
+              rows: [
+                {
+                  type: "header", template: "MRI  Viewer",
+                  css: "headerclass"
+                },
+                { view: "template", content: "papayaMriDiv", borderless: true },
+                referenceImage,
+              ]
+
+            },
+            {
+              rows: [
+                {
+                  type: "header", template: "Comparative View",
+                  css: "headerclass",
+                },
+                { view: "template", content: "papayaMriDiv2", borderless: true },
+                referenceImage2
+              ]
             }
           ]
-        },
+        }],
 
-        position: "center",
-        body: histogramWindowForm
+    });
 
-      })
+    //-- To excute immediately after window loading
+    //-- 0 for MRI viewer, 2 for Label viewer
+    papayaContainers[0].preferences.smoothDisplay = 'Yes';
+    papayaContainers[2].preferences.smoothDisplay = 'No';
 
-      //-------------------------------------------------------//
-      //-------------------------Main--------------------------//
-      //-------------------------------------------------------// 
+    //-- 1 for MRI viewer, 3 for Label viewer
+    papayaContainers[1].preferences.smoothDisplay = 'Yes';
+    papayaContainers[3].preferences.smoothDisplay = 'No';
 
-      webix.ui({
-        margin: 5,
-        rows: [
-          //toolbar,
-          {
-            margin: 20,
-            padding: 20,
-            cols: [
-              {
-                width: 250, margin: 10, rows: [
-                  //referenceImage,
-                  //referenceImage2,
-                  //inputOptions,
-                  Segmentation,
-                  //outputOptions,
-                  downloadNiftiFile,
-                  hardwareStatus,
-                  {}
-                ]
-              },
-              {
-                rows: [
-                  {
-                    type: "header", template: "MRI  Viewer",
-                    css: "headerclass"
-                  },
-                  { view: "template", content: "papayaMriDiv", borderless: true },
-                  referenceImage,
-                ]
-
-              },
-              {
-                rows: [
-                  {
-                    type: "header", template: "Comparative View",
-                    css: "headerclass",
-                  },
-                  { view: "template", content: "papayaMriDiv2", borderless: true },
-                  referenceImage2
-                ]
-              }
-            ]
-          }],
-
-      });
-
-      //-- To excute immediately after window loading
-      //-- 0 for MRI viewer, 2 for Label viewer
-      papayaContainers[0].preferences.smoothDisplay = 'Yes';
-      papayaContainers[2].preferences.smoothDisplay = 'No';
-
-      //-- 1 for MRI viewer, 3 for Label viewer
-      papayaContainers[1].preferences.smoothDisplay = 'Yes';
-      papayaContainers[3].preferences.smoothDisplay = 'No';
-
-      //--Activate annotation for papaya container 1- default    
-      addMouseMoveHandler("./models/GT/labels.json", 1);
+    //--Activate annotation for papaya container 1- default    
+    addMouseMoveHandler("./models/GT/labels.json", 1);
 
 
-      document.getElementById(PAPAYA_CONTROL_MAIN_SWAP_BUTTON_CSS + papayaContainers[1].containerIndex).addEventListener("click", function () {
-        papayaContainers[0].viewer.rotateViews()
-      })
+    document.getElementById(PAPAYA_CONTROL_MAIN_SWAP_BUTTON_CSS + papayaContainers[1].containerIndex).addEventListener("click", function () {
+      papayaContainers[0].viewer.rotateViews()
+    })
 
-      // Check for possible wrongly report or duplicate models ids
-      checkInferenceModelList();
+    // Check for possible wrongly report or duplicate models ids
+    checkInferenceModelList();
     })
   </script>
 

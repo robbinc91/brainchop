@@ -17,6 +17,7 @@ class StageNames(Enum):
     POSTPROCESSING = 'postprocessing'
     LARGEST_CONNECTED_COMPONENT_EXTRACTION = 'largest_connected_component_extraction'
     UNCROPPING = 'uncropping'
+    RESTORING_ORIGINAL_ShAPE = 'restoring_original_shape'
 
 
 class Stage:
